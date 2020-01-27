@@ -1,0 +1,48 @@
+{
+  "name": "web-help",
+  "version": "0.0.1",
+  "description": "WebHelp UI",
+  "main": "index.js",
+  "scripts": {
+    "start": "cross-env NODE_ENV=development webpack-dev-server",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "cross-env NODE_ENV=production webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/DmitryMakhnev/WebHelp.git"
+  },
+  "author": "Dmitry Makhnev",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DmitryMakhnev/WebHelp/issues"
+  },
+  "homepage": "https://github.com/DmitryMakhnev/WebHelp#readme",
+  "devDependencies": {
+    "@types/react": "^16.9.19",
+    "@types/react-dom": "^16.9.5",
+    "autoprefixer": "^9.7.4",
+    "clean-webpack-plugin": "^3.0.0",
+    "cross-env": "^7.0.0",
+    "css-hot-loader": "^1.4.4",
+    "css-loader": "^3.4.2",
+    "file-loader": "^5.0.2",
+    "html-webpack-plugin": "^4.0.0-beta.11",
+    "mini-css-extract-plugin": "^0.9.0",
+    "node-sass": "^4.13.1",
+    "optimize-css-assets-webpack-plugin": "^5.0.3",
+    "postcss-loader": "^3.0.0",
+    "postcss-safe-parser": "^4.0.1",
+    "sass-loader": "^8.0.2",
+    "terser-webpack-plugin": "^2.3.2",
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.7.5",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.10.1"
+  },
+  "dependencies": {
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0"
+  }
+}
