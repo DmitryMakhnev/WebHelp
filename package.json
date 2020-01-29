@@ -7,7 +7,8 @@
     "start": "cross-env NODE_ENV=development webpack-dev-server",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "cross-env NODE_ENV=production webpack",
-    "lint": "eslint --ext .js,.jsx,.ts,.tsx ./src"
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx ./src",
+    "prettier": "prettier --write \"src/**/*.{ts,tsx}\""
   },
   "repository": {
     "type": "git",
@@ -41,6 +42,7 @@
     "optimize-css-assets-webpack-plugin": "^5.0.3",
     "postcss-loader": "^3.0.0",
     "postcss-safe-parser": "^4.0.1",
+    "prettier": "1.19.1",
     "sass-loader": "^8.0.2",
     "terser-webpack-plugin": "^2.3.2",
     "ts-loader": "^6.2.1",
