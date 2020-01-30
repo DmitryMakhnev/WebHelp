@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/DmitryMakhnev/WebHelp#readme",
   "devDependencies": {
+    "@types/classnames": "^2.2.9",
     "@types/react": "^16.9.19",
     "@types/react-dom": "^16.9.5",
     "@typescript-eslint/eslint-plugin": "^2.18.0",
@@ -54,6 +55,7 @@
     "webpack-dev-server": "^3.10.1"
   },
   "dependencies": {
+    "classnames": "^2.2.6",
     "react": "^16.12.0",
     "react-dom": "^16.12.0"
   },

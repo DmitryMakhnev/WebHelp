@@ -1,0 +1,22 @@
+@import "vars-and-mixins";
+
+body,
+html,
+header,
+main,
+div,
+h1 {
+  margin: 0;
+  padding: 0;
+  }
+
+body {
+  font-family: $default-font-family;
+  font-size: $default-font-size;
+  color: $default-font-color;
+  }
+
+a {
+  font-family: $default-font-family;
+  font-size: $default-font-size;
+  }

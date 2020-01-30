@@ -1,0 +1,9 @@
+@import "../../styles/vars-and-mixins";
+
+.header {
+  height: $layout-header-height;
+  box-sizing: border-box;
+  // custom colors for stubs
+  background-color: $default-navigation-block-background;
+  border-bottom: 1px solid $default-separator-color;
+  }
