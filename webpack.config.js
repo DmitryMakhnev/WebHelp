@@ -13,11 +13,12 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 const isEnvDevelopment = NODE_ENV === 'development';
 const isEnvProduction = NODE_ENV === 'production';
 
-const prodOrDev = (prod, dev) => isEnvProduction ? prod : dev;
+const prodOrDev = (prod, dev) => (isEnvProduction ? prod : dev);
 
 const plugins = [
   new webpack.DefinePlugin({
     'process.env.NODE_ENV': JSON.stringify(NODE_ENV),
+    WEB_HELP_API_ROOT_URL: JSON.stringify('/api'),
   }),
   new CleanWebpackPlugin(),
   new HtmlWebpackPlugin({
@@ -76,13 +77,16 @@ module.exports = {
   mode: NODE_ENV,
 
   devtool: prodOrDev(
-    false ,
+    false,
     'cheap-module-source-map',
   ),
   devServer: {
     publicPath: '/',
     hot: isEnvDevelopment,
     port: 3001,
+    proxy: {
+      '/api': 'http://localhost:3002',
+    },
   },
 
   optimization: {
@@ -123,10 +127,10 @@ module.exports = {
     },
   },
 
-  plugins: plugins,
+  plugins,
 
   resolve: {
-    extensions: [ '.tsx', '.ts', '.js' ],
+    extensions: ['.tsx', '.ts', '.js'],
   },
 
   module: {
@@ -135,8 +139,10 @@ module.exports = {
       {
         test: /\.scss$/i,
         use: [
-          // I know that repo with loader is archived but MiniCssExtractPlugin and extract-css-chunks-webpack-plugin
-          // had problems with hmr for css-modules. I'd like to invest more time for finding better solution
+          // I know that repo with loader is archived
+          // but MiniCssExtractPlugin and extract-css-chunks-webpack-plugin
+          // had problems with hmr for css-modules.
+          // I'd like to invest more time for finding better solution
           // after main tasks well be ready
           // I think tht scooped css classes names during all modes are important
           'css-hot-loader',
