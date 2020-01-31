@@ -29,7 +29,7 @@ export class MobXFetchingDataStateModel {
   private transition(fetchingDataStateAction: FetchingDataStateAction) {
     this.stateMachineState = fetchingDataStateMachine.transition(
       this.stateMachineState,
-      fetchingDataStateAction
+      fetchingDataStateAction,
     );
   }
 

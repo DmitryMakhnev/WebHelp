@@ -21,19 +21,14 @@ export class FetchingDataStateFlags implements BaseFetchingDataStateFlags {
 
   get isFetching(): boolean {
     return (
-      this.isLoading ||
-      this.isLoadingAfterFailure ||
-      this.isUpdating ||
-      this.isUpdatingAfterFailure
+      this.isLoading || this.isLoadingAfterFailure || this.isUpdating || this.isUpdatingAfterFailure
     );
   }
 
   constructor(creationSubset: BaseFetchingDataStateFlagsSubset = {}) {
-    (Object.keys(creationSubset) as BaseFetchingDataStateKeys[]).forEach(
-      key => {
-        this[key] = creationSubset[key] as boolean;
-      }
-    );
+    (Object.keys(creationSubset) as BaseFetchingDataStateKeys[]).forEach(key => {
+      this[key] = creationSubset[key] as boolean;
+    });
     Object.freeze(this);
   }
 }

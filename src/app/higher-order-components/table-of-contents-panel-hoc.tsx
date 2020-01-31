@@ -7,24 +7,18 @@ export type TableOfContentsPanelHOCProps = {
   className?: string;
 };
 
-export const TableOfContentsPanelHoc: FC<TableOfContentsPanelHOCProps> = observer(
-  props => {
-    const dataLayerConnection = useContext(DataLayerConnectionContext);
+export const TableOfContentsPanelHoc: FC<TableOfContentsPanelHOCProps> = observer(props => {
+  const dataLayerConnection = useContext(DataLayerConnectionContext);
 
-    useEffect(() => {
-      dataLayerConnection.tableOfContentsFetchingController
-        .fetch()
-        .catch(() => {
-          // TODO [dmitry.makhnev]: log
-        });
-    }, []);
-    return (
-      <TableOfContentsPanel
-        className={props.className}
-        dataState={
-          dataLayerConnection.tableOfContentsModel.fetchingDataState.state
-        }
-      />
-    );
-  }
-);
+  useEffect(() => {
+    dataLayerConnection.tableOfContentsFetchingController.fetch().catch(() => {
+      // TODO [dmitry.makhnev]: log
+    });
+  }, []);
+  return (
+    <TableOfContentsPanel
+      className={props.className}
+      dataState={dataLayerConnection.tableOfContentsModel.fetchingDataState.state}
+    />
+  );
+});

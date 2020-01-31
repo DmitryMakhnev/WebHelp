@@ -40,7 +40,7 @@ export const MappingFetchingDataStatesToFlags: {
 };
 
 export function mapFetchingDataStateToFlags(
-  fetchingDataState: FetchingDataState
+  fetchingDataState: FetchingDataState,
 ): FetchingDataStateFlags {
   return MappingFetchingDataStatesToFlags[fetchingDataState];
 }

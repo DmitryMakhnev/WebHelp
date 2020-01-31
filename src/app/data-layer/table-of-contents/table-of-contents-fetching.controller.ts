@@ -11,22 +11,18 @@ export class TableOfContentsFetchingController {
       tableOfContentsModel.fetchingDataState.fetch();
 
       return fetchFromApi<TableOfContentsApiResponse>(
-        `${WEB_HELP_API_ROOT_URL}/2019.3/HelpTOC.json`
+        `${WEB_HELP_API_ROOT_URL}/2019.3/HelpTOC.json`,
       ).then(
         tableOfContentsResponse => {
-          tableOfContentsModel
-            .setData(tableOfContentsResponse)
-            .fetchingDataState.success();
+          tableOfContentsModel.setData(tableOfContentsResponse).fetchingDataState.success();
           return tableOfContentsResponse;
         },
         (error: Error) => {
-          tableOfContentsModel
-            .setDataFetchingError(error)
-            .fetchingDataState.fail();
+          tableOfContentsModel.setDataFetchingError(error).fetchingDataState.fail();
           throw error;
-        }
+        },
       );
-    }
+    },
   );
 
   fetch(): Promise<TableOfContentsApiResponse> {

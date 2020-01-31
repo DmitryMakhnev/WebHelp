@@ -26,11 +26,7 @@ export interface FSMAction {
  *        David Khourshid — The visual future of reactive applications with statecharts
  *        https://www.youtube.com/watch?v=o84Xw8qiTCw*
  */
-export const fetchingDataStateMachine = createMachine<
-  FSMContext,
-  FSMAction,
-  FMSType
->({
+export const fetchingDataStateMachine = createMachine<FSMContext, FSMAction, FMSType>({
   id: 'FetchingDataStateMachine',
   initial: FetchingDataStates.NONE,
   states: {
@@ -51,23 +47,20 @@ export const fetchingDataStateMachine = createMachine<
     [FetchingDataStates.LOADING]: {
       on: {
         [FetchingDataStateActions.SUCCESS]: FetchingDataStates.READY,
-        [FetchingDataStateActions.FAILURE]:
-          FetchingDataStates.FAILURE_DURING_LOADING,
+        [FetchingDataStateActions.FAILURE]: FetchingDataStates.FAILURE_DURING_LOADING,
         [FetchingDataStateActions.RESET]: FetchingDataStates.NONE,
       },
     },
     [FetchingDataStates.FAILURE_DURING_LOADING]: {
       on: {
-        [FetchingDataStateActions.FETCHING]:
-          FetchingDataStates.LOADING_AFTER_FAILURE,
+        [FetchingDataStateActions.FETCHING]: FetchingDataStates.LOADING_AFTER_FAILURE,
         [FetchingDataStateActions.RESET]: FetchingDataStates.NONE,
       },
     },
     [FetchingDataStates.LOADING_AFTER_FAILURE]: {
       on: {
         [FetchingDataStateActions.SUCCESS]: FetchingDataStates.READY,
-        [FetchingDataStateActions.FAILURE]:
-          FetchingDataStates.FAILURE_DURING_LOADING,
+        [FetchingDataStateActions.FAILURE]: FetchingDataStates.FAILURE_DURING_LOADING,
         [FetchingDataStateActions.RESET]: FetchingDataStates.NONE,
       },
     },
@@ -76,23 +69,20 @@ export const fetchingDataStateMachine = createMachine<
     [FetchingDataStates.UPDATING]: {
       on: {
         [FetchingDataStateActions.SUCCESS]: FetchingDataStates.READY,
-        [FetchingDataStateActions.FAILURE]:
-          FetchingDataStates.FAILURE_DURING_UPDATE,
+        [FetchingDataStateActions.FAILURE]: FetchingDataStates.FAILURE_DURING_UPDATE,
         [FetchingDataStateActions.RESET]: FetchingDataStates.NONE,
       },
     },
     [FetchingDataStates.FAILURE_DURING_UPDATE]: {
       on: {
-        [FetchingDataStateActions.FETCHING]:
-          FetchingDataStates.UPDATING_AFTER_FAILURE,
+        [FetchingDataStateActions.FETCHING]: FetchingDataStates.UPDATING_AFTER_FAILURE,
         [FetchingDataStateActions.RESET]: FetchingDataStates.NONE,
       },
     },
     [FetchingDataStates.UPDATING_AFTER_FAILURE]: {
       on: {
         [FetchingDataStateActions.SUCCESS]: FetchingDataStates.READY,
-        [FetchingDataStateActions.FAILURE]:
-          FetchingDataStates.FAILURE_DURING_UPDATE,
+        [FetchingDataStateActions.FAILURE]: FetchingDataStates.FAILURE_DURING_UPDATE,
         [FetchingDataStateActions.RESET]: FetchingDataStates.NONE,
       },
     },

@@ -10,13 +10,11 @@ interface DataLayerConnectionContextValue {
 function createDefaultDataLayerConnectionContextValue(): DataLayerConnectionContextValue {
   const tableOfContentsModel = new TableOfContentsModel();
   return {
-    tableOfContentsFetchingController: new TableOfContentsFetchingController(
-      tableOfContentsModel
-    ),
+    tableOfContentsFetchingController: new TableOfContentsFetchingController(tableOfContentsModel),
     tableOfContentsModel,
   };
 }
 
-export const DataLayerConnectionContext = createContext<
-  DataLayerConnectionContextValue
->(createDefaultDataLayerConnectionContextValue());
+export const DataLayerConnectionContext = createContext<DataLayerConnectionContextValue>(
+  createDefaultDataLayerConnectionContextValue(),
+);

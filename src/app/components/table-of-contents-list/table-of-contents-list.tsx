@@ -4,6 +4,4 @@ import styles from './table-of-contents-list.scss';
 
 export const TableOfContentsList: FC<{
   className?: string;
-}> = props => (
-  <div className={classNames(styles.tableOfContentsList, props.className)} />
-);
+}> = props => <div className={classNames(styles.tableOfContentsList, props.className)} />;
