@@ -18,18 +18,21 @@ export const TableOfContentsPanelHoc: FC<TableOfContentsPanelHOCProps> = observe
   console.log('render hoc');
 
   const dataLayerConnection = useContext(DataLayerConnectionContext);
-  useEffect(() => {
-    console.log('hok run effect');
-    dataLayerConnection.tableOfContentsFetchingController.fetch().catch(() => {
-      // TODO [dmitry.makhnev]: log
-    });
-  }, []);
 
   const [tableOfContentsViewModel] = useState(
     () => createTableOfContentsPanelViewModel(
       dataLayerConnection.tableOfContentsModel,
     ),
   );
+
+  useEffect(() => {
+    console.log('hok run effect');
+    WEB_HELP_OUTSIDE_API.selectByPageId = pageId => tableOfContentsViewModel
+      .tree.selectNodeByPageId(pageId, true);
+    dataLayerConnection.tableOfContentsFetchingController.fetch().catch(() => {
+      // TODO [dmitry.makhnev]: log
+    });
+  }, []);
 
   return (
     <TableOfContentsPanel

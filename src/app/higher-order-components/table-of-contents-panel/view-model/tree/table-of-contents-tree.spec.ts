@@ -2,6 +2,7 @@ import HelpTOCJson from '../../../../../../stub-server/public/api/2019.3/HelpTOC
 import { createTableOfContentsTree } from './table-of-contents-tree';
 import { TableOfContentsTreeNode } from './table-of-contents-tree-node';
 import { IncorrectFixtureError } from '../../../../../lib/errors/incorrect-fixture-error';
+import { getPagesPathToPageFromRoot } from '../../../../data-layer/table-of-contents/get-pages-path-to-page-from-root';
 
 const response: TableOfContentsApiResponse = HelpTOCJson as unknown as TableOfContentsApiResponse;
 
@@ -148,6 +149,52 @@ describe('TablesOfContentTree', () => {
         tree.selectNode(newNodeForSelection);
         const currentAnchorsIds = tree.currentAnchors.list.map(currentAnchor => currentAnchor.id);
         expect(currentAnchorsIds).toEqual(notSelectedFirstLevelPageIdWithAnchors.anchors);
+      });
+    });
+    describe('selectNodeByPageId', () => {
+      it('select not found page', () => {
+        const tree = createTableOfContentsTree(response);
+        const isNodeWasSelected = tree.selectNodeByPageId('__NOT_FOUND_ID__');
+        expect(isNodeWasSelected).toBeFalsy();
+        expect(tree.selectedNode).toBe(null);
+      });
+
+      it('select page for into not built subtree', () => {
+        const tree = createTableOfContentsTree(response);
+        const thirdLevelPage = Object.values(response.entities.pages)
+          .find(page => page.level === 2 && page.pages);
+        if (!thirdLevelPage) {
+          throw new IncorrectFixtureError('Don\'t have any page on third level');
+        }
+        const isNodeWasSelected = tree.selectNodeByPageId(thirdLevelPage.id);
+        expect(isNodeWasSelected).toBeTruthy();
+        const selectedNode = tree.selectedNode as TableOfContentsTreeNode;
+        expect(selectedNode.page.id).toBe(thirdLevelPage.id);
+      });
+
+      it('reselect after subtree destruction', () => {
+        const tree = createTableOfContentsTree(response);
+        const thirdLevelPage = Object.values(response.entities.pages)
+          .find(page => page.level === 2 && page.pages);
+        if (!thirdLevelPage) {
+          throw new IncorrectFixtureError('Don\'t have any page on third level');
+        }
+        const thirdLevelPageId = thirdLevelPage.id;
+        tree.selectNodeByPageId(thirdLevelPageId);
+        const firstTimeSelectedNode = tree.selectedNode as TableOfContentsTreeNode;
+        const pathToSelectedNode = getPagesPathToPageFromRoot(
+          response,
+          thirdLevelPageId,
+        ) as TableOfContentsPageId[];
+        const firstLevelPageOfSelectedPage = tree.children.find(
+          node => node.page.id === pathToSelectedNode[0],
+        ) as TableOfContentsTreeNode;
+        tree.manageNodeContent(firstLevelPageOfSelectedPage, false);
+        tree.selectNodeByPageId(thirdLevelPageId);
+        const secondTimeSelectedNode = tree.selectedNode as TableOfContentsTreeNode;
+        expect(firstTimeSelectedNode).toBeDefined();
+        expect(secondTimeSelectedNode).toBeDefined();
+        expect(secondTimeSelectedNode).not.toBe(firstTimeSelectedNode);
       });
     });
   });

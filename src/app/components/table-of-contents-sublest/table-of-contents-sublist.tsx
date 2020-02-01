@@ -17,7 +17,11 @@ export const TableOfContentsSublist: FC<TableOfContentsSublistProps> = observer(
 
   return (
     <div className={classNames(styles.tableOfContentsSublist, props.className)}>
-      <div>
+      <div
+        className={classNames({
+          [styles.selected]: node.isSelected,
+        })}
+      >
         <button type="button" onClick={node.select}>{node.page.title}</button>
         { jsxIf(
           node.isHasContent,

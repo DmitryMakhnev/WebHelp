@@ -19,6 +19,7 @@ const plugins = [
   new webpack.DefinePlugin({
     'process.env.NODE_ENV': JSON.stringify(NODE_ENV),
     WEB_HELP_API_ROOT_URL: JSON.stringify('/api'),
+    WEB_HELP_OUTSIDE_API: '(window.JB_WEB_HELP_API || (window.JB_WEB_HELP_API = {}))',
   }),
   new CleanWebpackPlugin(),
   new HtmlWebpackPlugin({
