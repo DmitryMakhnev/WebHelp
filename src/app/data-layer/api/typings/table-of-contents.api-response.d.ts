@@ -22,8 +22,8 @@ interface TableOfContentsAnchor {
 
 interface TableOfContentsApiResponse {
   entities: {
-    pages: { [key: TableOfContentsPageId]: TableOfContentsPage };
-    anchors: { [key: TableOfContentsAnchorId]: TableOfContentsAnchor };
-    topLevelIds: TableOfContentsPageId[];
+    pages: Record<TableOfContentsPageId, TableOfContentsPage>;
+    anchors: Record<TableOfContentsAnchorId, TableOfContentsAnchor>;
   };
+  topLevelIds: TableOfContentsPageId[];
 }

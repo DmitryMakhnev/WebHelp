@@ -1,3 +1,4 @@
+import { runInAction } from 'mobx';
 import { fetchFromApi } from '../api/fetchFromApi';
 import { TableOfContentsModel } from './table-of-contents.model';
 import { DeduplicationForSinglePromise } from '../../../lib/deduplications/deduplication-for-single-promise';
@@ -14,11 +15,15 @@ export class TableOfContentsFetchingController {
         `${WEB_HELP_API_ROOT_URL}/2019.3/HelpTOC.json`,
       ).then(
         tableOfContentsResponse => {
-          tableOfContentsModel.setData(tableOfContentsResponse).fetchingDataState.success();
+          runInAction(() => {
+            tableOfContentsModel.setData(tableOfContentsResponse).fetchingDataState.success();
+          });
           return tableOfContentsResponse;
         },
         (error: Error) => {
-          tableOfContentsModel.setDataFetchingError(error).fetchingDataState.fail();
+          runInAction(() => {
+            tableOfContentsModel.setDataFetchingError(error).fetchingDataState.fail();
+          });
           throw error;
         },
       );

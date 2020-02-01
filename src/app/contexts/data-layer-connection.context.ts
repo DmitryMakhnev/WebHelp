@@ -1,6 +1,9 @@
 import { createContext } from 'react';
 import { TableOfContentsFetchingController } from '../data-layer/table-of-contents/table-of-contents-fetching.controller';
-import { TableOfContentsModel } from '../data-layer/table-of-contents/table-of-contents.model';
+import {
+  createTableOfContentsModel,
+  TableOfContentsModel,
+} from '../data-layer/table-of-contents/table-of-contents.model';
 
 interface DataLayerConnectionContextValue {
   tableOfContentsModel: TableOfContentsModel;
@@ -8,7 +11,7 @@ interface DataLayerConnectionContextValue {
 }
 
 function createDefaultDataLayerConnectionContextValue(): DataLayerConnectionContextValue {
-  const tableOfContentsModel = new TableOfContentsModel();
+  const tableOfContentsModel = createTableOfContentsModel();
   return {
     tableOfContentsFetchingController: new TableOfContentsFetchingController(tableOfContentsModel),
     tableOfContentsModel,

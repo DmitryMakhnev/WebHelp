@@ -4,10 +4,10 @@
   "description": "WebHelp UI",
   "main": "index.js",
   "scripts": {
+    "test": "jest",
     "start": "concurrently --kill-others --names \"webpack,stubs-server\" \"npm run start:webpack\" \"npm run start:stubs-server\" ",
     "start:webpack": "cross-env NODE_ENV=development webpack-dev-server",
     "start:stubs-server": "node stub-server/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "cross-env NODE_ENV=production webpack",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx ./src",
     "prettier": "prettier --write \"src/**/*.{ts,tsx}\""
@@ -24,6 +24,7 @@
   "homepage": "https://github.com/DmitryMakhnev/WebHelp#readme",
   "devDependencies": {
     "@types/classnames": "^2.2.9",
+    "@types/jest": "^25.1.1",
     "@types/react": "^16.9.19",
     "@types/react-dom": "^16.9.5",
     "@typescript-eslint/eslint-plugin": "^2.18.0",
@@ -42,6 +43,7 @@
     "file-loader": "^5.0.2",
     "html-webpack-plugin": "^4.0.0-beta.11",
     "husky": "^4.2.1",
+    "jest": "^25.1.0",
     "lint-staged": "^10.0.4",
     "mini-css-extract-plugin": "^0.9.0",
     "node-sass": "^4.13.1",
@@ -52,6 +54,7 @@
     "sass-loader": "^8.0.2",
     "serve-handler": "^6.1.2",
     "terser-webpack-plugin": "^2.3.2",
+    "ts-jest": "^25.1.0",
     "ts-loader": "^6.2.1",
     "typescript": "^3.7.5",
     "webpack": "^4.41.5",

@@ -1,4 +1,4 @@
-import { action, observable } from 'mobx';
+import { action, observable, runInAction } from 'mobx';
 import { MobXFetchingDataStateModel } from '../../../lib/fetching-data-state/integrations/mobx/mob-x-fetching-data-state-model';
 
 export class TableOfContentsModel {
@@ -21,4 +21,8 @@ export class TableOfContentsModel {
     this.data = data;
     return this;
   }
+}
+
+export function createTableOfContentsModel() {
+  return runInAction(() => new TableOfContentsModel());
 }

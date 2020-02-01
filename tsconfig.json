@@ -20,6 +20,7 @@
     "jsx": "react"
   },
   "include": [
-    "src"
+    "src",
+    "src/app/data-layer/api/typings/table-of-contents.api-response.d.ts"
   ]
 }
