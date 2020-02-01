@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import classNames from 'classnames';
 import { observer } from 'mobx-react';
 import styles from './table-of-contents-sublist.scss';
-import { TableOfContentsTreeNode } from '../../higher-order-components/table-of-contents-panel/view-model/tree/create-table-of-contents-tree-node';
+import { TableOfContentsTreeNode } from '../../higher-order-components/table-of-contents-panel/view-model/tree/table-of-contents-tree-node';
 import { jsxIf } from '../../../lib/jsx/jsx-if';
 
 
@@ -12,19 +12,20 @@ export interface TableOfContentsSublistProps {
 }
 
 export const TableOfContentsSublist: FC<TableOfContentsSublistProps> = observer(props => {
+  console.log('TableOfContentsSublist rendering');
   const node = props.node;
 
   return (
     <div className={classNames(styles.tableOfContentsSublist, props.className)}>
       <div>
-        {node.page.title}
+        <button type="button" onClick={node.select}>{node.page.title}</button>
         { jsxIf(
           node.isHasContent,
           <button type="button" onClick={node.toggle}>toggle</button>,
         ) }
       </div>
       { jsxIf(
-        node.isContendShowed,
+        node.isContendBuilt,
         node.children.map(
           childNode => (
             <TableOfContentsSublist

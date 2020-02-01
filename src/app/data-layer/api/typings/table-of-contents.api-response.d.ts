@@ -8,7 +8,7 @@ interface TableOfContentsPage {
   url?: string;
   level: number;
   pages?: TableOfContentsPageId[];
-  anchors?: TableOfContentsAnchorId;
+  anchors?: TableOfContentsAnchorId[];
 }
 
 interface TableOfContentsAnchor {

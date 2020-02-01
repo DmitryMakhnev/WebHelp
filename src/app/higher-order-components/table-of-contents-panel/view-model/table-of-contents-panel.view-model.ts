@@ -1,6 +1,6 @@
 import { computed, runInAction } from 'mobx';
 import { TableOfContentsModel } from '../../../data-layer/table-of-contents/table-of-contents.model';
-import { createTableOfContentsTree, TableOfContentsTree } from './tree/create-table-of-contents-tree';
+import { createTableOfContentsTree, TableOfContentsTree } from './tree/table-of-contents-tree';
 
 export class TableOfContentsPanelViewModel {
   constructor(
