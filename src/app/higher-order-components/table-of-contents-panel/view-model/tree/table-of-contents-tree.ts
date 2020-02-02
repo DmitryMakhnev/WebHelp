@@ -42,11 +42,11 @@ export class TableOfContentsTree {
 
   @action
   private setSelectedPageId(pageId: TableOfContentsPageId|null): boolean {
-    const isPageNotExist = pageId == null
-      || !this.indexByApi
-      || !this.indexByApi.entities.pages[pageId];
-    this.selectedPageId = isPageNotExist ? null : pageId;
-    return !isPageNotExist;
+    const isPageExist = pageId != null
+      && this.indexByApi != null
+      && this.indexByApi.entities.pages[pageId] != null;
+    this.selectedPageId = isPageExist ? pageId : null;
+    return isPageExist;
   }
 
   @computed
