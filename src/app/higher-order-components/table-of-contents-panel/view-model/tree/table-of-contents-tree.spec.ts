@@ -1,10 +1,26 @@
 import HelpTOCJson from '../../../../../../stub-server/public/api/2019.3/HelpTOC.json';
-import { createTableOfContentsTree } from './table-of-contents-tree';
+import { createTableOfContentsTree, TableOfContentsTree } from './table-of-contents-tree';
 import { TableOfContentsTreeNode } from './table-of-contents-tree-node';
 import { IncorrectFixtureError } from '../../../../../lib/errors/incorrect-fixture-error';
 import { getPagesPathToPageFromRoot } from '../../../../data-layer/table-of-contents/get-pages-path-to-page-from-root';
 
 const response: TableOfContentsApiResponse = HelpTOCJson as unknown as TableOfContentsApiResponse;
+
+function findNodesByPath(
+  tree: TableOfContentsTree,
+  path: TableOfContentsPageId[],
+): TableOfContentsTreeNode[] {
+  const nodesByPath: TableOfContentsTreeNode[] = [];
+  let currentChildrenHolder: TableOfContentsTree|TableOfContentsTreeNode|undefined = tree;
+  for (let i = 0; i !== path.length; i += 1) {
+    currentChildrenHolder = currentChildrenHolder.children.find(node => node.page.id === path[i]);
+    if (!currentChildrenHolder) {
+      break;
+    }
+    nodesByPath.push(currentChildrenHolder);
+  }
+  return nodesByPath;
+}
 
 describe('TablesOfContentTree', () => {
   describe('was create without errors', () => {
@@ -34,51 +50,6 @@ describe('TablesOfContentTree', () => {
     it('root nodes is empty for nullable data', () => {
       const tree = createTableOfContentsTree(null);
       expect(tree.children.length).toBe(0);
-    });
-  });
-
-  describe('anchors', () => {
-    it('use anchors of first page after creation', () => {
-      const tree = createTableOfContentsTree(response);
-      const currentAnchorIds = tree.currentAnchors.list.map(anchor => anchor.id);
-      expect(currentAnchorIds).toEqual(
-        response.entities.pages[response.topLevelIds[0]].anchors || [],
-      );
-    });
-
-    describe('useAnchorsOfPage', () => {
-      it('change current anchors correct', () => {
-        const tree = createTableOfContentsTree(response);
-        const responsePages = response.entities.pages;
-        const fistPage = responsePages[response.topLevelIds[0]];
-        const pageForTesting = Object.values(responsePages).find(
-          page => page !== fistPage && page.anchors && page.anchors.length !== 0,
-        );
-        if (!pageForTesting) {
-          throw new IncorrectFixtureError('not first page with anchors wasn\'t found');
-        }
-        tree.useAnchorsOfPage(pageForTesting.id);
-        const currentAnchorIds = tree.currentAnchors.list.map(anchor => anchor.id);
-        expect(currentAnchorIds).toEqual(pageForTesting.anchors);
-      });
-
-      it('current anchors of page without anchors empty', () => {
-        const tree = createTableOfContentsTree(response);
-        const topLevelPageWithoutAnchors = response.topLevelIds
-          .map(pageId => response.entities.pages[pageId])
-          .find(page => !page.anchors);
-        if (!topLevelPageWithoutAnchors) {
-          throw new IncorrectFixtureError('don\'t have top level page without anchors');
-        }
-        tree.useAnchorsOfPage(topLevelPageWithoutAnchors.id);
-        expect(tree.currentAnchors.hasAnchors).toBeFalsy();
-      });
-
-      it('list of anchors empty for empty response', () => {
-        const tree = createTableOfContentsTree(null);
-        tree.useAnchorsOfPage('someId');
-        expect(tree.currentAnchors.hasAnchors).toBeFalsy();
-      });
     });
   });
 
@@ -115,87 +86,137 @@ describe('TablesOfContentTree', () => {
         expect(nodeWithContent.children.length).toBe(0);
       });
     });
-    describe('selected node', () => {
-      it('tree which was created without data has not selected node', () => {
-        const tree = createTableOfContentsTree(null);
-        expect(tree.selectedNode).toBe(null);
-      });
-
-      it('first node had to be selected after init', () => {
-        const tree = createTableOfContentsTree(response);
-        const firstPageId = response.entities.pages[response.topLevelIds[0]].id;
-        expect(tree.selectedNode).toBeDefined();
-        expect((tree.selectedNode as TableOfContentsTreeNode).page.id).toBe(firstPageId);
-      });
-
-      it('current anchors were updated during select node', () => {
-        const tree = createTableOfContentsTree(response);
-        const currentSelectedNode = tree.selectedNode;
-        if (!currentSelectedNode) {
-          throw new IncorrectFixtureError('Don\'t have any page');
-        }
-        const notSelectedFirstLevelPageIdWithAnchors = response.topLevelIds
-          .map(pageId => response.entities.pages[pageId])
-          .find(
-            firstLevelPage => currentSelectedNode.page.id !== firstLevelPage.id
-              && firstLevelPage.anchors && firstLevelPage.anchors.length !== 0,
-          );
-        if (!notSelectedFirstLevelPageIdWithAnchors) {
-          throw new IncorrectFixtureError('Don\'t not first top level page with anchors');
-        }
-        const newNodeForSelection = tree.children.find(
-          node => node.page.id === notSelectedFirstLevelPageIdWithAnchors.id,
-        ) as TableOfContentsTreeNode;
-        tree.selectNode(newNodeForSelection);
-        const currentAnchorsIds = tree.currentAnchors.list.map(currentAnchor => currentAnchor.id);
-        expect(currentAnchorsIds).toEqual(notSelectedFirstLevelPageIdWithAnchors.anchors);
-      });
+  });
+  describe('select page', () => {
+    it('tree which was created without data has not selected node', () => {
+      const tree = createTableOfContentsTree(null);
+      expect(tree.selectedPageId).toBe(null);
     });
-    describe('selectNodeByPageId', () => {
-      it('select not found page', () => {
-        const tree = createTableOfContentsTree(response);
-        const isNodeWasSelected = tree.selectNodeByPageId('__NOT_FOUND_ID__');
-        expect(isNodeWasSelected).toBeFalsy();
-        expect(tree.selectedNode).toBe(null);
-      });
 
-      it('select page for into not built subtree', () => {
-        const tree = createTableOfContentsTree(response);
-        const thirdLevelPage = Object.values(response.entities.pages)
-          .find(page => page.level === 2 && page.pages);
-        if (!thirdLevelPage) {
-          throw new IncorrectFixtureError('Don\'t have any page on third level');
-        }
-        const isNodeWasSelected = tree.selectNodeByPageId(thirdLevelPage.id);
-        expect(isNodeWasSelected).toBeTruthy();
-        const selectedNode = tree.selectedNode as TableOfContentsTreeNode;
-        expect(selectedNode.page.id).toBe(thirdLevelPage.id);
-      });
+    it('select not found page', () => {
+      const tree = createTableOfContentsTree(response);
+      const isPageWasSelected = tree.selectByPageId('__NOT_FOUND_ID__');
+      expect(isPageWasSelected).toBeFalsy();
+      expect(tree.selectedPageId).toBe(null);
+    });
 
-      it('reselect after subtree destruction', () => {
-        const tree = createTableOfContentsTree(response);
-        const thirdLevelPage = Object.values(response.entities.pages)
-          .find(page => page.level === 2 && page.pages);
-        if (!thirdLevelPage) {
-          throw new IncorrectFixtureError('Don\'t have any page on third level');
-        }
-        const thirdLevelPageId = thirdLevelPage.id;
-        tree.selectNodeByPageId(thirdLevelPageId);
-        const firstTimeSelectedNode = tree.selectedNode as TableOfContentsTreeNode;
-        const pathToSelectedNode = getPagesPathToPageFromRoot(
-          response,
-          thirdLevelPageId,
-        ) as TableOfContentsPageId[];
-        const firstLevelPageOfSelectedPage = tree.children.find(
-          node => node.page.id === pathToSelectedNode[0],
-        ) as TableOfContentsTreeNode;
-        tree.manageNodeContent(firstLevelPageOfSelectedPage, false);
-        tree.selectNodeByPageId(thirdLevelPageId);
-        const secondTimeSelectedNode = tree.selectedNode as TableOfContentsTreeNode;
-        expect(firstTimeSelectedNode).toBeDefined();
-        expect(secondTimeSelectedNode).toBeDefined();
-        expect(secondTimeSelectedNode).not.toBe(firstTimeSelectedNode);
-      });
+    it('first node had to be selected after init', () => {
+      const tree = createTableOfContentsTree(response);
+      const firstPageId = response.entities.pages[response.topLevelIds[0]].id;
+      expect(tree.selectedPageId).toBe(firstPageId);
+      const selectedNodeOfFirstLevel = tree.children.find(
+        node => node.page.id === firstPageId,
+      ) as TableOfContentsTreeNode;
+      expect(selectedNodeOfFirstLevel.isSelected).toBeTruthy();
+    });
+
+    it('selected node is not parent of selected', () => {
+      const tree = createTableOfContentsTree(response);
+      const firstPageId = response.entities.pages[response.topLevelIds[0]].id;
+      expect(tree.selectedPageId).toBe(firstPageId);
+      const selectedNodeOfFirstLevel = tree.children.find(
+        node => node.page.id === firstPageId,
+      ) as TableOfContentsTreeNode;
+      expect(selectedNodeOfFirstLevel.isParentOfSelected).toBeFalsy();
+    });
+
+    it('select page for into not built subtree', () => {
+      const tree = createTableOfContentsTree(response);
+      const thirdLevelPage = Object.values(response.entities.pages)
+        .find(page => page.level === 2 && page.pages);
+      if (!thirdLevelPage) {
+        throw new IncorrectFixtureError('Don\'t have any page on third level');
+      }
+      const thirdLevelPageId = thirdLevelPage.id;
+      const isPageWasSelected = tree.selectByPageId(thirdLevelPageId);
+      const pathToSelectedNode = getPagesPathToPageFromRoot(
+        response,
+        thirdLevelPageId,
+      ) as TableOfContentsPageId[];
+      // console.log(pathToSelectedNode);
+      const nodesByPath = findNodesByPath(tree, pathToSelectedNode);
+      expect(isPageWasSelected).toBeTruthy();
+      expect(tree.selectedPageId).toBe(thirdLevelPageId);
+      expect(nodesByPath[0].isParentOfSelected).toBeTruthy();
+      expect(nodesByPath[1].isParentOfSelected).toBeTruthy();
+      expect(nodesByPath[2].isSelected).toBeTruthy();
+    });
+
+    it('parent of selected saves after selected node was destroyed', () => {
+      const tree = createTableOfContentsTree(response);
+      const thirdLevelPage = Object.values(response.entities.pages)
+        .find(page => page.level === 2 && page.pages);
+      if (!thirdLevelPage) {
+        throw new IncorrectFixtureError('Don\'t have any page on third level');
+      }
+      const thirdLevelPageId = thirdLevelPage.id;
+      tree.selectByPageId(thirdLevelPageId);
+      const pathToSelectedNode = getPagesPathToPageFromRoot(
+        response,
+        thirdLevelPageId,
+      ) as TableOfContentsPageId[];
+      const nodesByPath = findNodesByPath(tree, pathToSelectedNode);
+      const secondLevelNode = nodesByPath[1];
+      // destroy level with selected node
+      tree.manageNodeContent(secondLevelNode, false);
+      expect(nodesByPath[0].isParentOfSelected).toBeTruthy();
+      expect(secondLevelNode.isParentOfSelected).toBeTruthy();
+    });
+
+
+    it('reselect after subtree destruction', () => {
+      const tree = createTableOfContentsTree(response);
+      const thirdLevelPage = Object.values(response.entities.pages)
+        .find(page => page.level === 2 && page.pages);
+      if (!thirdLevelPage) {
+        throw new IncorrectFixtureError('Don\'t have any page on third level');
+      }
+      const thirdLevelPageId = thirdLevelPage.id;
+      tree.selectByPageId(thirdLevelPageId);
+      const pathToSelectedNode = getPagesPathToPageFromRoot(
+        response,
+        thirdLevelPageId,
+      ) as TableOfContentsPageId[];
+      const nodesByPath = findNodesByPath(tree, pathToSelectedNode);
+      const firstLevelNode = nodesByPath[0];
+      // destroy all levels except first
+      tree.manageNodeContent(nodesByPath[0], false);
+      tree.selectByPageId(thirdLevelPageId);
+      const nodesByPathAfterReselect = findNodesByPath(tree, pathToSelectedNode);
+      expect(firstLevelNode.isParentOfSelected).toBeTruthy();
+      expect(nodesByPathAfterReselect[1].isParentOfSelected).toBeTruthy();
+      expect(nodesByPathAfterReselect[2].isSelected).toBeTruthy();
+    });
+  });
+
+  describe('anchors', () => {
+    it('use anchors of first page after creation', () => {
+      const tree = createTableOfContentsTree(response);
+      const currentAnchorIds = tree.currentAnchors.list.map(anchor => anchor.id);
+      expect(currentAnchorIds).toEqual(response.entities.pages[response.topLevelIds[0]].anchors);
+    });
+
+    it('current anchors were updated during select node', () => {
+      const tree = createTableOfContentsTree(response);
+      const currentSelectedPageId = tree.selectedPageId;
+      if (!currentSelectedPageId) {
+        throw new IncorrectFixtureError('Don\'t have any page');
+      }
+      const notSelectedFirstLevelPageIdWithAnchors = response.topLevelIds
+        .map(pageId => response.entities.pages[pageId])
+        .find(
+          firstLevelPage => currentSelectedPageId !== firstLevelPage.id
+            && firstLevelPage.anchors && firstLevelPage.anchors.length !== 0,
+        );
+      if (!notSelectedFirstLevelPageIdWithAnchors) {
+        throw new IncorrectFixtureError('Don\'t not first top level page with anchors');
+      }
+      const newNodeForSelection = tree.children.find(
+        node => node.page.id === notSelectedFirstLevelPageIdWithAnchors.id,
+      ) as TableOfContentsTreeNode;
+      tree.selectByPageId(newNodeForSelection.page.id);
+      const currentAnchorsIds = tree.currentAnchors.list.map(currentAnchor => currentAnchor.id);
+      expect(currentAnchorsIds).toEqual(notSelectedFirstLevelPageIdWithAnchors.anchors);
     });
   });
 });

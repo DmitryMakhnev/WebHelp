@@ -1,4 +1,10 @@
-import { action, observable, runInAction } from 'mobx';
+import
+{
+  action,
+  computed,
+  observable,
+  runInAction,
+} from 'mobx';
 // eslint-disable-next-line import/no-cycle
 import { createTableOfContentsTreeNode, TableOfContentsTreeNode } from './table-of-contents-tree-node';
 import { createTableOfContentsTreeAnchors, TableOfContentsTreeAnchors } from './table-of-contents-tree-anchors';
@@ -24,7 +30,7 @@ export class TableOfContentsTree {
     if (this.indexByApi) {
       this.children = this.createNodes(this.indexByApi.topLevelIds);
       this.registerNodesInIndex(this.children);
-      this.selectNode(this.children[0]);
+      this.setSelectedPageId(this.children[0].page.id);
     }
   }
 
@@ -32,19 +38,44 @@ export class TableOfContentsTree {
   children: TableOfContentsTreeNode[] = [];
 
   @observable.ref
-  selectedNode: TableOfContentsTreeNode|null = null;
-
-  @observable.ref
-  currentAnchors: TableOfContentsTreeAnchors = createTableOfContentsTreeAnchors([]);
-
-  private buildNodesByIdIndex: Map<TableOfContentsPageId, TableOfContentsTreeNode> = new Map();
+  selectedPageId: TableOfContentsPageId|null = null;
 
   @action
-  useAnchorsOfPage(pageId: TableOfContentsPageId|null): TableOfContentsTreeAnchors {
-    const anchors = this.indexByApi && pageId ? findAnchorsOfPage(this.indexByApi, pageId) : [];
-    this.currentAnchors = createTableOfContentsTreeAnchors(anchors);
-    return this.currentAnchors;
+  private setSelectedPageId(pageId: TableOfContentsPageId|null): boolean {
+    const isPageNotExist = pageId == null
+      || !this.indexByApi
+      || !this.indexByApi.entities.pages[pageId];
+    this.selectedPageId = isPageNotExist ? null : pageId;
+    return !isPageNotExist;
   }
+
+  @computed
+  get pageIdsOfParentsOfSelectedPage(): Set<TableOfContentsPageId> {
+    const selectedPageId = this.selectedPageId;
+    const pageIdsOfParents = new Set<TableOfContentsPageId>();
+    if (selectedPageId) {
+      const pathToSelectedPage = getPagesPathToPageFromRoot(
+        this.indexByApi as TableOfContentsApiResponse,
+        selectedPageId,
+      ) as TableOfContentsPageId[];
+      if (pathToSelectedPage.length > 1) {
+        const indexOfLastParent = pathToSelectedPage.length - 2;
+        for (let i = 0; i <= indexOfLastParent; i += 1) {
+          pageIdsOfParents.add(pathToSelectedPage[i]);
+        }
+      }
+    }
+    return pageIdsOfParents;
+  }
+
+  @computed
+  get currentAnchors(): TableOfContentsTreeAnchors {
+    const pageId = this.selectedPageId;
+    const anchors = this.indexByApi && pageId ? findAnchorsOfPage(this.indexByApi, pageId) : [];
+    return createTableOfContentsTreeAnchors(anchors);
+  }
+
+  private buildNodesByIdIndex: Map<TableOfContentsPageId, TableOfContentsTreeNode> = new Map();
 
   @action
   manageNodeContent(node: TableOfContentsTreeNode, isContendBuilt: boolean) {
@@ -65,17 +96,11 @@ export class TableOfContentsTree {
   }
 
   @action
-  selectNode(node: TableOfContentsTreeNode|null) {
-    this.selectedNode = node;
-    this.useAnchorsOfPage(node ? node.page.id : null);
-  }
-
-  @action
-  selectNodeByPageId(
+  selectByPageId(
     pageId: TableOfContentsPageId,
     buildNodeContent: boolean = false,
   ): boolean {
-    let node = this.buildNodesByIdIndex.get(pageId);
+    const node = this.buildNodesByIdIndex.get(pageId);
 
     if (!node && this.indexByApi) {
       const pathToNode = getPagesPathToPageFromRoot(
@@ -84,21 +109,20 @@ export class TableOfContentsTree {
       );
       if (pathToNode) {
         this.buildNodesByPath(pathToNode);
-        node = this.buildNodesByIdIndex.get(pageId);
       }
     }
 
-    this.selectNode(node || null);
-    const isNodeWasSelected = this.selectedNode != null;
+    const isPageWasSelected = this.setSelectedPageId(pageId);
 
-    if (isNodeWasSelected && buildNodeContent) {
+    if (isPageWasSelected && buildNodeContent) {
+      const resultSelectedNode = this.buildNodesByIdIndex.get(pageId) as TableOfContentsTreeNode;
       this.manageNodeContent(
-        this.selectedNode as TableOfContentsTreeNode,
+        resultSelectedNode,
         true,
       );
     }
 
-    return isNodeWasSelected;
+    return isPageWasSelected;
   }
 
   private buildNodesByPath(

@@ -28,7 +28,7 @@ export const TableOfContentsPanelHoc: FC<TableOfContentsPanelHOCProps> = observe
   useEffect(() => {
     console.log('hok run effect');
     WEB_HELP_OUTSIDE_API.selectByPageId = pageId => tableOfContentsViewModel
-      .tree.selectNodeByPageId(pageId, true);
+      .tree.selectByPageId(pageId, true);
     dataLayerConnection.tableOfContentsFetchingController.fetch().catch(() => {
       // TODO [dmitry.makhnev]: log
     });

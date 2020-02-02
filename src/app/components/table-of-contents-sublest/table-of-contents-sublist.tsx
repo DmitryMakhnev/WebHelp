@@ -20,6 +20,7 @@ export const TableOfContentsSublist: FC<TableOfContentsSublistProps> = observer(
       <div
         className={classNames({
           [styles.selected]: node.isSelected,
+          [styles.selectedParent]: node.isParentOfSelected,
         })}
       >
         <button type="button" onClick={node.select}>{node.page.title}</button>

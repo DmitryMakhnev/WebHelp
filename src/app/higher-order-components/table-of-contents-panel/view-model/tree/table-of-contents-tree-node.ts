@@ -35,8 +35,13 @@ export class TableOfContentsTreeNode {
   }
 
   @computed
-  get isSelected() {
-    return this.tree.selectedNode === this;
+  get isSelected(): boolean {
+    return this.page.id === this.tree.selectedPageId;
+  }
+
+  @computed
+  get isParentOfSelected(): boolean {
+    return this.tree.pageIdsOfParentsOfSelectedPage.has(this.page.id);
   }
 
   @action.bound
@@ -46,7 +51,7 @@ export class TableOfContentsTreeNode {
 
   @action.bound
   select() {
-    this.tree.selectNode(this);
+    this.tree.selectByPageId(this.page.id);
   }
 }
 
