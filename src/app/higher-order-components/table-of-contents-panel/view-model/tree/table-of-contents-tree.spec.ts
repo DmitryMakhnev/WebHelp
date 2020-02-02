@@ -187,6 +187,26 @@ describe('TablesOfContentTree', () => {
       expect(nodesByPathAfterReselect[1].isParentOfSelected).toBeTruthy();
       expect(nodesByPathAfterReselect[2].isSelected).toBeTruthy();
     });
+
+    it('build selected node content', () => {
+      const tree = createTableOfContentsTree(response);
+      const pagesFromData = response.entities.pages;
+      const thirdLevelPage = Object.values(pagesFromData)
+        .find(page => page.level === 2 && page.pages);
+      if (!thirdLevelPage || !thirdLevelPage.parentId) {
+        throw new IncorrectFixtureError('Don\'t have any page on third level');
+      }
+      const secondLevelPage = pagesFromData[thirdLevelPage.parentId];
+      const secondLevelPageId = secondLevelPage.id;
+      tree.selectByPageId(secondLevelPageId, true);
+      const pathToSelectedNode = getPagesPathToPageFromRoot(
+        response,
+        secondLevelPageId,
+      ) as TableOfContentsPageId[];
+      const nodesByPath = findNodesByPath(tree, pathToSelectedNode);
+      expect(nodesByPath[1].children.length)
+        .toBe((secondLevelPage.pages as TableOfContentsPageId[]).length);
+    });
   });
 
   describe('anchors', () => {
