@@ -3,8 +3,8 @@ type TableOfContentsAnchorId = string;
 
 interface TableOfContentsPage {
   id: TableOfContentsPageId;
+  title: string;
   parentId?: TableOfContentsPageId;
-  title?: string;
   url?: string;
   level: number;
   pages?: TableOfContentsPageId[];

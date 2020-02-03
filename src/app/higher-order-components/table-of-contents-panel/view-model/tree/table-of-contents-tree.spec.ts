@@ -1,26 +1,14 @@
 import HelpTOCJson from '../../../../../../stub-server/public/api/2019.3/HelpTOC.json';
-import { createTableOfContentsTree, TableOfContentsTree } from './table-of-contents-tree';
+import { createTableOfContentsTree } from './table-of-contents-tree';
 import { TableOfContentsTreeNode } from './table-of-contents-tree-node';
 import { IncorrectFixtureError } from '../../../../../lib/errors/incorrect-fixture-error';
 import { getPagesPathToPageFromRoot } from '../../../../data-layer/table-of-contents/get-pages-path-to-page-from-root';
+import { findNodesByPath } from './test-utils/find-nodes-by-path';
+import { getUniqueValuesOfFieldOfAllPages } from '../../../../data-layer/table-of-contents/test-utils/get-unique-values-of-field-of-all-pages';
+import { createTableOfContentsFilter } from '../../../../data-layer/table-of-contents/filtration/table-of-contents-filter';
+import { findAllCurrentChildrenOfTree } from './test-utils/find-all-current-children-of-tree';
 
 const response: TableOfContentsApiResponse = HelpTOCJson as unknown as TableOfContentsApiResponse;
-
-function findNodesByPath(
-  tree: TableOfContentsTree,
-  path: TableOfContentsPageId[],
-): TableOfContentsTreeNode[] {
-  const nodesByPath: TableOfContentsTreeNode[] = [];
-  let currentChildrenHolder: TableOfContentsTree|TableOfContentsTreeNode|undefined = tree;
-  for (let i = 0; i !== path.length; i += 1) {
-    currentChildrenHolder = currentChildrenHolder.children.find(node => node.page.id === path[i]);
-    if (!currentChildrenHolder) {
-      break;
-    }
-    nodesByPath.push(currentChildrenHolder);
-  }
-  return nodesByPath;
-}
 
 describe('TablesOfContentTree', () => {
   describe('was create without errors', () => {
@@ -59,7 +47,7 @@ describe('TablesOfContentTree', () => {
         const tree = createTableOfContentsTree(response);
         const responsePages = response.entities.pages;
         const nodeWithContent = tree.children.find(
-          node => node.isHasContent,
+          node => node.isHasChildPages,
         );
         if (!nodeWithContent) {
           throw new IncorrectFixtureError('first level page with content wasn\'t found');
@@ -76,7 +64,7 @@ describe('TablesOfContentTree', () => {
       it('remove content for node', () => {
         const tree = createTableOfContentsTree(response);
         const nodeWithContent = tree.children.find(
-          node => node.isHasContent,
+          node => node.isHasChildPages,
         );
         if (!nodeWithContent) {
           throw new IncorrectFixtureError('first level page with content wasn\'t found');
@@ -94,8 +82,10 @@ describe('TablesOfContentTree', () => {
     });
 
     it('select not found page', () => {
+      const uniqueIdsOfFixture = getUniqueValuesOfFieldOfAllPages(response.entities.pages, 'id');
+      const notExistPageId = `${uniqueIdsOfFixture.values().next()}!`;
       const tree = createTableOfContentsTree(response);
-      const isPageWasSelected = tree.selectByPageId('__NOT_FOUND_ID__');
+      const isPageWasSelected = tree.selectByPageId(notExistPageId);
       expect(isPageWasSelected).toBeFalsy();
       expect(tree.selectedPageId).toBe(null);
     });
@@ -123,7 +113,7 @@ describe('TablesOfContentTree', () => {
     it('select page for into not built subtree', () => {
       const tree = createTableOfContentsTree(response);
       const thirdLevelPage = Object.values(response.entities.pages)
-        .find(page => page.level === 2 && page.pages);
+        .find(page => page.level === 2);
       if (!thirdLevelPage) {
         throw new IncorrectFixtureError('Don\'t have any page on third level');
       }
@@ -145,7 +135,7 @@ describe('TablesOfContentTree', () => {
     it('parent of selected saves after selected node was destroyed', () => {
       const tree = createTableOfContentsTree(response);
       const thirdLevelPage = Object.values(response.entities.pages)
-        .find(page => page.level === 2 && page.pages);
+        .find(page => page.level === 2);
       if (!thirdLevelPage) {
         throw new IncorrectFixtureError('Don\'t have any page on third level');
       }
@@ -167,7 +157,7 @@ describe('TablesOfContentTree', () => {
     it('reselect after subtree destruction', () => {
       const tree = createTableOfContentsTree(response);
       const thirdLevelPage = Object.values(response.entities.pages)
-        .find(page => page.level === 2 && page.pages);
+        .find(page => page.level === 2);
       if (!thirdLevelPage) {
         throw new IncorrectFixtureError('Don\'t have any page on third level');
       }
@@ -194,7 +184,7 @@ describe('TablesOfContentTree', () => {
       const thirdLevelPage = Object.values(pagesFromData)
         .find(page => page.level === 2 && page.pages);
       if (!thirdLevelPage || !thirdLevelPage.parentId) {
-        throw new IncorrectFixtureError('Don\'t have any page on third level');
+        throw new IncorrectFixtureError('Don\'t have any page on third level with children page');
       }
       const secondLevelPage = pagesFromData[thirdLevelPage.parentId];
       const secondLevelPageId = secondLevelPage.id;
@@ -237,6 +227,70 @@ describe('TablesOfContentTree', () => {
       tree.selectByPageId(newNodeForSelection.page.id);
       const currentAnchorsIds = tree.currentAnchors.list.map(currentAnchor => currentAnchor.id);
       expect(currentAnchorsIds).toEqual(notSelectedFirstLevelPageIdWithAnchors.anchors);
+    });
+  });
+
+  describe('filtration', () => {
+    it('has not filtered filtration after init', () => {
+      const tree = createTableOfContentsTree(response);
+      expect(tree.isFiltrationMode).toBeFalsy();
+      expect(tree.hasResultsByFiltration).toBeFalsy();
+      expect(tree.textOfFiltration).toBe(null);
+    });
+
+    it('has correct filtration state after unmatched filtration', () => {
+      const tree = createTableOfContentsTree(response);
+      const pagesFromData = response.entities.pages;
+      const uniquePagesTitles = getUniqueValuesOfFieldOfAllPages(pagesFromData, 'title');
+      const notMatchableTitle = `${uniquePagesTitles.values().next()}!`;
+      tree.filterByText(notMatchableTitle);
+      expect(tree.isFiltrationMode).toBeTruthy();
+      expect(tree.hasResultsByFiltration).toBeFalsy();
+      expect(tree.textOfFiltration).toBe(notMatchableTitle);
+    });
+
+    it('has correct filtration state after matched filtration', () => {
+      const pagesFromData = response.entities.pages;
+      const thirdLevelPage = Object.values(pagesFromData)
+        .find(page => page.level === 2 && page.pages);
+      if (!thirdLevelPage || !thirdLevelPage.parentId) {
+        throw new IncorrectFixtureError('Don\'t have any page on third level with children page');
+      }
+      const tree = createTableOfContentsTree(response);
+      const textForFiltration = thirdLevelPage;
+      tree.filterByText(textForFiltration.title);
+      expect(tree.isFiltrationMode).toBeTruthy();
+      expect(tree.hasResultsByFiltration).toBeTruthy();
+      expect(tree.textOfFiltration).toBe(textForFiltration.title);
+    });
+
+    it('has all built nodes after matched filtration', () => {
+      const pagesFromData = response.entities.pages;
+      const thirdLevelPage = Object.values(pagesFromData)
+        .find(page => page.level === 2 && page.pages);
+      if (!thirdLevelPage || !thirdLevelPage.parentId) {
+        throw new IncorrectFixtureError('Don\'t have any page on third level with children page');
+      }
+      const textForFiltration = thirdLevelPage.title;
+      console.log(textForFiltration);
+      const filter = createTableOfContentsFilter(response);
+      filter.filterByText(textForFiltration);
+      const pureFiltrationResult = filter.filtrationResult;
+      const foundPagesIds = pureFiltrationResult.foundPageIds;
+      const tree = createTableOfContentsTree(response);
+      tree.filterByText(textForFiltration);
+      const buildNodePageIds = new Set(
+        findAllCurrentChildrenOfTree(tree).map(node => node.page.id),
+      );
+      expect(buildNodePageIds).toEqual(foundPagesIds);
+    });
+
+    it('return nodes which was before filtration after resetting of filtration', () => {
+      const tree = createTableOfContentsTree(response);
+      const nodesBeforeFiltration = tree.children;
+      tree.filterByText('some text');
+      tree.resetFiltration();
+      expect(tree.children).toBe(nodesBeforeFiltration);
     });
   });
 });

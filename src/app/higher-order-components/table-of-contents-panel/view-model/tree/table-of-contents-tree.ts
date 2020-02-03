@@ -9,33 +9,78 @@ import
 import { createTableOfContentsTreeNode, TableOfContentsTreeNode } from './table-of-contents-tree-node';
 import { createTableOfContentsTreeAnchors, TableOfContentsTreeAnchors } from './table-of-contents-tree-anchors';
 import { getPagesPathToPageFromRoot } from '../../../../data-layer/table-of-contents/get-pages-path-to-page-from-root';
-
-function findAnchorsOfPage(
-  tableOfContentsApiResponse: TableOfContentsApiResponse,
-  pageId: TableOfContentsPageId,
-): TableOfContentsAnchor[] {
-  const entities = tableOfContentsApiResponse.entities;
-  const anchorIds = entities.pages[pageId].anchors;
-  if (anchorIds) {
-    const anchors = entities.anchors;
-    return anchorIds.map(anchorId => anchors[anchorId]);
-  }
-  return [];
-}
+import { findAnchorsOfPage } from '../../../../data-layer/table-of-contents/find-anchors-of-page';
+import {
+  createTableOfContentsFilter,
+  TableOfContentsFilter,
+} from '../../../../data-layer/table-of-contents/filtration/table-of-contents-filter';
 
 export class TableOfContentsTree {
   constructor(
-    private indexByApi: TableOfContentsApiResponse|null,
+    private readonly tableOfContents: TableOfContentsApiResponse|null,
   ) {
-    if (this.indexByApi) {
-      this.children = this.createNodes(this.indexByApi.topLevelIds);
-      this.registerNodesInIndex(this.children);
-      this.setSelectedPageId(this.children[0].page.id);
+    this.filter = createTableOfContentsFilter(this.tableOfContents);
+    if (this.tableOfContents) {
+      this.defaultModeChildren = this.createNodes(this.tableOfContents.topLevelIds);
+      this.registerNodesInIndex(this.defaultModeChildren);
+      this.setSelectedPageId(this.defaultModeChildren[0].page.id);
     }
   }
 
-  @observable.ref
-  children: TableOfContentsTreeNode[] = [];
+  private readonly filter: TableOfContentsFilter;
+
+  @computed
+  get isFiltrationMode() {
+    return this.filter.filtrationResult.wasFiltered;
+  }
+
+  @computed
+  get hasResultsByFiltration() {
+    return this.filter.filtrationResult.hasMatched;
+  }
+
+  @computed
+  get textOfFiltration() {
+    return this.filter.filtrationResult.textFilter;
+  }
+
+  @computed
+  get currentTableOfContents() {
+    return this.isFiltrationMode
+      ? this.filter.filtrationResult.tableOfContent
+      : this.tableOfContents;
+  }
+
+  // eslint-disable-next-line max-len
+  private readonly defaultIndexOfBuildNodes = new Map<TableOfContentsPageId, TableOfContentsTreeNode>();
+
+  // eslint-disable-next-line max-len
+  private filtrationModeIndexOfBuildNodes = new Map<TableOfContentsPageId, TableOfContentsTreeNode>();
+
+  private get indexOfBuildNodes() {
+    return this.isFiltrationMode
+      ? this.filtrationModeIndexOfBuildNodes
+      : this.defaultIndexOfBuildNodes;
+  }
+
+  private readonly defaultModeChildren: TableOfContentsTreeNode[] = [];
+
+  @computed
+  private get filtrationModeChildren(): TableOfContentsTreeNode[] {
+    if (!this.isFiltrationMode || !this.hasResultsByFiltration) {
+      return [];
+    }
+    const currentTableOfContents = (this.currentTableOfContents as TableOfContentsApiResponse);
+    const nodes = this.createNodes(currentTableOfContents.topLevelIds);
+    this.registerNodesInIndex(nodes);
+    this.buildAllNodeOfNodes(nodes);
+    return nodes;
+  }
+
+  @computed
+  get children(): TableOfContentsTreeNode[] {
+    return this.isFiltrationMode ? this.filtrationModeChildren : this.defaultModeChildren;
+  }
 
   @observable.ref
   selectedPageId: TableOfContentsPageId|null = null;
@@ -43,8 +88,8 @@ export class TableOfContentsTree {
   @action
   private setSelectedPageId(pageId: TableOfContentsPageId|null): boolean {
     const isPageExist = pageId != null
-      && this.indexByApi != null
-      && this.indexByApi.entities.pages[pageId] != null;
+      && this.currentTableOfContents != null
+      && this.currentTableOfContents.entities.pages[pageId] != null;
     this.selectedPageId = isPageExist ? pageId : null;
     return isPageExist;
   }
@@ -55,7 +100,7 @@ export class TableOfContentsTree {
     const pageIdsOfParents = new Set<TableOfContentsPageId>();
     if (selectedPageId) {
       const pathToSelectedPage = getPagesPathToPageFromRoot(
-        this.indexByApi as TableOfContentsApiResponse,
+        this.tableOfContents as TableOfContentsApiResponse,
         selectedPageId,
       ) as TableOfContentsPageId[];
       if (pathToSelectedPage.length > 1) {
@@ -71,15 +116,15 @@ export class TableOfContentsTree {
   @computed
   get currentAnchors(): TableOfContentsTreeAnchors {
     const pageId = this.selectedPageId;
-    const anchors = this.indexByApi && pageId ? findAnchorsOfPage(this.indexByApi, pageId) : [];
+    const anchors = this.tableOfContents && pageId
+      ? findAnchorsOfPage(this.tableOfContents, pageId)
+      : [];
     return createTableOfContentsTreeAnchors(anchors);
   }
 
-  private buildNodesByIdIndex: Map<TableOfContentsPageId, TableOfContentsTreeNode> = new Map();
-
   @action
   manageNodeContent(node: TableOfContentsTreeNode, isContendBuilt: boolean) {
-    if (node.isHasContent && node.isContendBuilt !== isContendBuilt) {
+    if (node.isHasChildPages && node.isContendBuilt !== isContendBuilt) {
       node.setIsContendBuilt(isContendBuilt);
       let children: TableOfContentsTreeNode[];
       if (isContendBuilt) {
@@ -100,29 +145,42 @@ export class TableOfContentsTree {
     pageId: TableOfContentsPageId,
     buildNodeContent: boolean = false,
   ): boolean {
-    const node = this.buildNodesByIdIndex.get(pageId);
+    const isPageWasSelected = this.setSelectedPageId(pageId);
 
-    if (!node && this.indexByApi) {
-      const pathToNode = getPagesPathToPageFromRoot(
-        this.indexByApi,
-        pageId,
-      );
-      if (pathToNode) {
-        this.buildNodesByPath(pathToNode);
+    if (isPageWasSelected) {
+      const node = this.indexOfBuildNodes.get(pageId);
+
+      // build nodes if we need
+      if (!node && this.tableOfContents) {
+        const pathToNode = getPagesPathToPageFromRoot(
+          this.tableOfContents,
+          pageId,
+        );
+        if (pathToNode) {
+          this.buildNodesByPath(pathToNode);
+        }
+      }
+
+      if (buildNodeContent) {
+        const resultSelectedNode = this.indexOfBuildNodes.get(pageId) as TableOfContentsTreeNode;
+        this.manageNodeContent(
+          resultSelectedNode,
+          true,
+        );
       }
     }
 
-    const isPageWasSelected = this.setSelectedPageId(pageId);
-
-    if (isPageWasSelected && buildNodeContent) {
-      const resultSelectedNode = this.buildNodesByIdIndex.get(pageId) as TableOfContentsTreeNode;
-      this.manageNodeContent(
-        resultSelectedNode,
-        true,
-      );
-    }
-
     return isPageWasSelected;
+  }
+
+  @action.bound
+  filterByText(text: string) {
+    this.filter.filterByText(text);
+  }
+
+  @action.bound
+  resetFiltration() {
+    this.filter.rest();
   }
 
   private buildNodesByPath(
@@ -132,31 +190,54 @@ export class TableOfContentsTree {
     const iMax = pathToNode.length - 1;
     for (let i = 0; i !== iMax; i += 1) {
       const pageIdFromPath = pathToNode[i] as TableOfContentsPageId;
-      const node = this.buildNodesByIdIndex.get(pageIdFromPath) as TableOfContentsTreeNode;
+      const node = this.indexOfBuildNodes.get(pageIdFromPath) as TableOfContentsTreeNode;
       this.manageNodeContent(node, true);
+    }
+  }
+
+  private buildAllNodeOfNodes(
+    nodes: TableOfContentsTreeNode[],
+  ) {
+    let nodesForContentCreation = [...nodes];
+    while (nodesForContentCreation.length) {
+      const node = nodesForContentCreation.shift() as TableOfContentsTreeNode;
+      if (node.isHasChildPages) {
+        this.manageNodeContent(node, true);
+        nodesForContentCreation = nodesForContentCreation.concat(node.children);
+      }
     }
   }
 
   private createNodes(
     pagesIds: TableOfContentsPageId[],
   ): TableOfContentsTreeNode[] {
-    const pages = (this.indexByApi as TableOfContentsApiResponse).entities.pages;
-    return pagesIds.map(
-      pageId => createTableOfContentsTreeNode(
-        this,
-        pages[pageId],
-      ),
-    );
+    const pages = (this.currentTableOfContents as TableOfContentsApiResponse).entities.pages;
+    return pagesIds
+      .map(
+        pageId => pages[pageId],
+      )
+      /*
+       * during filtration some child pages can be outside of filtration result
+       * is not clear solution fir this method but it's effect of optimization for filtration
+       * because managing of filtering child pages isn't cheap
+       */
+      .filter(page => page != null)
+      .map(
+        page => createTableOfContentsTreeNode(
+          this,
+          page,
+        ),
+      );
   }
 
   private registerNodesInIndex(nodes: TableOfContentsTreeNode[]) {
     nodes.forEach(node => {
-      this.buildNodesByIdIndex.set(node.page.id, node);
+      this.indexOfBuildNodes.set(node.page.id, node);
     });
   }
 
   private unregisterNodesInIndex(nodes: TableOfContentsTreeNode[]) {
-    const nodesIndex = this.buildNodesByIdIndex;
+    const nodesIndex = this.indexOfBuildNodes;
     let allNodesForUnregistering: TableOfContentsTreeNode[] = [...nodes];
     while (allNodesForUnregistering.length) {
       const currentNode = allNodesForUnregistering.shift() as TableOfContentsTreeNode;

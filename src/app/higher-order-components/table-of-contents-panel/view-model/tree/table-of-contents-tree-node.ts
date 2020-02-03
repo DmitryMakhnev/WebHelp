@@ -14,8 +14,18 @@ export class TableOfContentsTreeNode {
     public page: TableOfContentsPage,
   ) {}
 
-  get isHasContent(): boolean {
+  get isHasChildPages(): boolean {
     return this.page.pages != null;
+  }
+
+  @computed
+  get isFound() {
+    return this.tree.isFiltrationMode;
+  }
+
+  @computed
+  get isAbleToBeToggled() {
+    return this.isFound ? this.children.length !== 0 : this.isHasChildPages;
   }
 
   @observable
@@ -39,6 +49,7 @@ export class TableOfContentsTreeNode {
     return this.page.id === this.tree.selectedPageId;
   }
 
+  // TODO [dmitry.makhnev]: think about behavior of this during filtration mode
   @computed
   get isParentOfSelected(): boolean {
     return this.tree.pageIdsOfParentsOfSelectedPage.has(this.page.id);

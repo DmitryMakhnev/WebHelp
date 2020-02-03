@@ -25,7 +25,7 @@ export const TableOfContentsSublist: FC<TableOfContentsSublistProps> = observer(
       >
         <button type="button" onClick={node.select}>{node.page.title}</button>
         { jsxIf(
-          node.isHasContent,
+          node.isAbleToBeToggled,
           <button type="button" onClick={node.toggle}>toggle</button>,
         ) }
       </div>
