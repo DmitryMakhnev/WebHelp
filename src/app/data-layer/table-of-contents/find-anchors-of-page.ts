@@ -1,4 +1,3 @@
-
 export function findAnchorsOfPage(
   tableOfContentsApiResponse: TableOfContentsApiResponse,
   pageId: TableOfContentsPageId,

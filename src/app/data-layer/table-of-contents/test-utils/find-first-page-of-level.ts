@@ -1,4 +1,3 @@
-
 export function findFirstPageOfLevel(
   tableOfContents: TableOfContentsApiResponse,
   level: number,

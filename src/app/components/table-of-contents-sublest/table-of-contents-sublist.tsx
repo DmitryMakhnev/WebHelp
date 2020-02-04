@@ -5,10 +5,9 @@ import styles from './table-of-contents-sublist.scss';
 import { TableOfContentsTreeNode } from '../../higher-order-components/table-of-contents-panel/view-model/tree/table-of-contents-tree-node';
 import { jsxIf } from '../../../lib/jsx/jsx-if';
 
-
 export interface TableOfContentsSublistProps {
   className?: string;
-  node: TableOfContentsTreeNode,
+  node: TableOfContentsTreeNode;
 }
 
 export const TableOfContentsSublist: FC<TableOfContentsSublistProps> = observer(props => {
@@ -23,24 +22,24 @@ export const TableOfContentsSublist: FC<TableOfContentsSublistProps> = observer(
           [styles.selectedParent]: node.isParentOfSelected,
         })}
       >
-        <button type="button" onClick={node.select}>{node.page.title}</button>
-        { jsxIf(
-          node.isAbleToBeToggled,
-          <button type="button" onClick={node.toggle}>toggle</button>,
-        ) }
+        <button type="button" onClick={node.select}>
+          {node.page.title}
+        </button>
+        {jsxIf(node.isAbleToBeToggled, () => (
+          <button type="button" onClick={node.toggle}>
+            toggle
+          </button>
+        ))}
       </div>
-      { jsxIf(
-        node.isContendBuilt,
-        node.children.map(
-          childNode => (
-            <TableOfContentsSublist
-              node={childNode}
-              key={childNode.page.id}
-              className={styles.innerSublist}
-            />
-          ),
-        ),
-      ) }
+      {jsxIf(node.isContendBuilt, () =>
+        node.children.map(childNode => (
+          <TableOfContentsSublist
+            node={childNode}
+            key={childNode.page.id}
+            className={styles.innerSublist}
+          />
+        )),
+      )}
     </div>
   );
 });

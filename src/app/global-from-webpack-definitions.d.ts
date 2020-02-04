@@ -6,5 +6,5 @@ declare const WEB_HELP_API_ROOT_URL: string;
 
 declare const WEB_HELP_OUTSIDE_API: {
   selectByPageId: (pageId: TableOfContentsPageId) => boolean;
-  filterByText: (text: string) => void
+  filterByText: (text: string) => void;
 };

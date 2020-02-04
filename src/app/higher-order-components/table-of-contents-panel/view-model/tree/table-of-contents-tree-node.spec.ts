@@ -2,7 +2,7 @@ import HelpTOCJson from '../../../../../../stub-server/public/api/2019.3/HelpTOC
 import { createTableOfContentsTree } from './table-of-contents-tree';
 import { createTableOfContentsTreeNode } from './table-of-contents-tree-node';
 
-const response: TableOfContentsApiResponse = HelpTOCJson as unknown as TableOfContentsApiResponse;
+const response: TableOfContentsApiResponse = (HelpTOCJson as unknown) as TableOfContentsApiResponse;
 
 describe('TableOfContentsTreeNode', () => {
   describe('was created without errors', () => {

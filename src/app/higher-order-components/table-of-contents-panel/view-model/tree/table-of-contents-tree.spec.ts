@@ -8,7 +8,7 @@ import { getUniqueValuesOfFieldOfAllPages } from '../../../../data-layer/table-o
 import { createTableOfContentsFilter } from '../../../../data-layer/table-of-contents/filtration/table-of-contents-filter';
 import { findAllCurrentChildrenOfTree } from './test-utils/find-all-current-children-of-tree';
 
-const response: TableOfContentsApiResponse = HelpTOCJson as unknown as TableOfContentsApiResponse;
+const response: TableOfContentsApiResponse = (HelpTOCJson as unknown) as TableOfContentsApiResponse;
 
 describe('TablesOfContentTree', () => {
   describe('was create without errors', () => {
@@ -46,11 +46,9 @@ describe('TablesOfContentTree', () => {
       it('build content for node', () => {
         const tree = createTableOfContentsTree(response);
         const responsePages = response.entities.pages;
-        const nodeWithContent = tree.children.find(
-          node => node.isHasChildPages,
-        );
+        const nodeWithContent = tree.children.find(node => node.isHasChildPages);
         if (!nodeWithContent) {
-          throw new IncorrectFixtureError('first level page with content wasn\'t found');
+          throw new IncorrectFixtureError("first level page with content wasn't found");
         }
         const pageOfNodeWithContent = responsePages[nodeWithContent.page.id];
         if (!pageOfNodeWithContent) {
@@ -63,11 +61,9 @@ describe('TablesOfContentTree', () => {
 
       it('remove content for node', () => {
         const tree = createTableOfContentsTree(response);
-        const nodeWithContent = tree.children.find(
-          node => node.isHasChildPages,
-        );
+        const nodeWithContent = tree.children.find(node => node.isHasChildPages);
         if (!nodeWithContent) {
-          throw new IncorrectFixtureError('first level page with content wasn\'t found');
+          throw new IncorrectFixtureError("first level page with content wasn't found");
         }
         tree.manageNodeContent(nodeWithContent, true);
         tree.manageNodeContent(nodeWithContent, false);
@@ -112,10 +108,9 @@ describe('TablesOfContentTree', () => {
 
     it('select page for into not built subtree', () => {
       const tree = createTableOfContentsTree(response);
-      const thirdLevelPage = Object.values(response.entities.pages)
-        .find(page => page.level === 2);
+      const thirdLevelPage = Object.values(response.entities.pages).find(page => page.level === 2);
       if (!thirdLevelPage) {
-        throw new IncorrectFixtureError('Don\'t have any page on third level');
+        throw new IncorrectFixtureError("Don't have any page on third level");
       }
       const thirdLevelPageId = thirdLevelPage.id;
       const isPageWasSelected = tree.selectByPageId(thirdLevelPageId);
@@ -134,10 +129,9 @@ describe('TablesOfContentTree', () => {
 
     it('parent of selected saves after selected node was destroyed', () => {
       const tree = createTableOfContentsTree(response);
-      const thirdLevelPage = Object.values(response.entities.pages)
-        .find(page => page.level === 2);
+      const thirdLevelPage = Object.values(response.entities.pages).find(page => page.level === 2);
       if (!thirdLevelPage) {
-        throw new IncorrectFixtureError('Don\'t have any page on third level');
+        throw new IncorrectFixtureError("Don't have any page on third level");
       }
       const thirdLevelPageId = thirdLevelPage.id;
       tree.selectByPageId(thirdLevelPageId);
@@ -153,13 +147,11 @@ describe('TablesOfContentTree', () => {
       expect(secondLevelNode.isParentOfSelected).toBeTruthy();
     });
 
-
     it('reselect after subtree destruction', () => {
       const tree = createTableOfContentsTree(response);
-      const thirdLevelPage = Object.values(response.entities.pages)
-        .find(page => page.level === 2);
+      const thirdLevelPage = Object.values(response.entities.pages).find(page => page.level === 2);
       if (!thirdLevelPage) {
-        throw new IncorrectFixtureError('Don\'t have any page on third level');
+        throw new IncorrectFixtureError("Don't have any page on third level");
       }
       const thirdLevelPageId = thirdLevelPage.id;
       tree.selectByPageId(thirdLevelPageId);
@@ -181,10 +173,11 @@ describe('TablesOfContentTree', () => {
     it('build selected node content', () => {
       const tree = createTableOfContentsTree(response);
       const pagesFromData = response.entities.pages;
-      const thirdLevelPage = Object.values(pagesFromData)
-        .find(page => page.level === 2 && page.pages);
+      const thirdLevelPage = Object.values(pagesFromData).find(
+        page => page.level === 2 && page.pages,
+      );
       if (!thirdLevelPage || !thirdLevelPage.parentId) {
-        throw new IncorrectFixtureError('Don\'t have any page on third level with children page');
+        throw new IncorrectFixtureError("Don't have any page on third level with children page");
       }
       const secondLevelPage = pagesFromData[thirdLevelPage.parentId];
       const secondLevelPageId = secondLevelPage.id;
@@ -194,8 +187,9 @@ describe('TablesOfContentTree', () => {
         secondLevelPageId,
       ) as TableOfContentsPageId[];
       const nodesByPath = findNodesByPath(tree, pathToSelectedNode);
-      expect(nodesByPath[1].children.length)
-        .toBe((secondLevelPage.pages as TableOfContentsPageId[]).length);
+      expect(nodesByPath[1].children.length).toBe(
+        (secondLevelPage.pages as TableOfContentsPageId[]).length,
+      );
     });
   });
 
@@ -210,16 +204,18 @@ describe('TablesOfContentTree', () => {
       const tree = createTableOfContentsTree(response);
       const currentSelectedPageId = tree.selectedPageId;
       if (!currentSelectedPageId) {
-        throw new IncorrectFixtureError('Don\'t have any page');
+        throw new IncorrectFixtureError("Don't have any page");
       }
       const notSelectedFirstLevelPageIdWithAnchors = response.topLevelIds
         .map(pageId => response.entities.pages[pageId])
         .find(
-          firstLevelPage => currentSelectedPageId !== firstLevelPage.id
-            && firstLevelPage.anchors && firstLevelPage.anchors.length !== 0,
+          firstLevelPage =>
+            currentSelectedPageId !== firstLevelPage.id &&
+            firstLevelPage.anchors &&
+            firstLevelPage.anchors.length !== 0,
         );
       if (!notSelectedFirstLevelPageIdWithAnchors) {
-        throw new IncorrectFixtureError('Don\'t not first top level page with anchors');
+        throw new IncorrectFixtureError("Don't not first top level page with anchors");
       }
       const newNodeForSelection = tree.children.find(
         node => node.page.id === notSelectedFirstLevelPageIdWithAnchors.id,
@@ -251,10 +247,11 @@ describe('TablesOfContentTree', () => {
 
     it('has correct filtration state after matched filtration', () => {
       const pagesFromData = response.entities.pages;
-      const thirdLevelPage = Object.values(pagesFromData)
-        .find(page => page.level === 2 && page.pages);
+      const thirdLevelPage = Object.values(pagesFromData).find(
+        page => page.level === 2 && page.pages,
+      );
       if (!thirdLevelPage || !thirdLevelPage.parentId) {
-        throw new IncorrectFixtureError('Don\'t have any page on third level with children page');
+        throw new IncorrectFixtureError("Don't have any page on third level with children page");
       }
       const tree = createTableOfContentsTree(response);
       const textForFiltration = thirdLevelPage;
@@ -266,10 +263,11 @@ describe('TablesOfContentTree', () => {
 
     it('has all built nodes after matched filtration', () => {
       const pagesFromData = response.entities.pages;
-      const thirdLevelPage = Object.values(pagesFromData)
-        .find(page => page.level === 2 && page.pages);
+      const thirdLevelPage = Object.values(pagesFromData).find(
+        page => page.level === 2 && page.pages,
+      );
       if (!thirdLevelPage || !thirdLevelPage.parentId) {
-        throw new IncorrectFixtureError('Don\'t have any page on third level with children page');
+        throw new IncorrectFixtureError("Don't have any page on third level with children page");
       }
       const textForFiltration = thirdLevelPage.title;
       console.log(textForFiltration);

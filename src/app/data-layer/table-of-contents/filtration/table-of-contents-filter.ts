@@ -1,30 +1,22 @@
-import
-{
-  action,
-  computed,
-  observable,
-  runInAction,
-} from 'mobx';
+import { action, computed, observable, runInAction } from 'mobx';
 import { findPagesByText } from './find-pages-by-text';
 
 /*
  * This filter doesn't work with Anchors
  */
 export class TableOfContentsFilter {
-  constructor(
-    tableOfContents: TableOfContentsApiResponse|null,
-  ) {
+  constructor(tableOfContents: TableOfContentsApiResponse | null) {
     this.tableOfContents = tableOfContents;
   }
 
   @observable.ref
-  private tableOfContents: TableOfContentsApiResponse|null;
+  private tableOfContents: TableOfContentsApiResponse | null;
 
   @observable.ref
-  private textFilter: string|null = null;
+  private textFilter: string | null = null;
 
   @action.bound
-  filterByText(text: string|null) {
+  filterByText(text: string | null) {
     this.textFilter = text;
   }
 
@@ -33,8 +25,8 @@ export class TableOfContentsFilter {
     const textFilter = this.textFilter;
     let wasFiltered = false;
     let hasMatched = false;
-    let tableOfContent: TableOfContentsApiResponse|null = null;
-    let foundPageIds: Set<TableOfContentsPageId>|null = null;
+    let tableOfContent: TableOfContentsApiResponse | null = null;
+    let foundPageIds: Set<TableOfContentsPageId> | null = null;
 
     if (textFilter) {
       wasFiltered = true;
@@ -72,8 +64,6 @@ export class TableOfContentsFilter {
   }
 }
 
-export function createTableOfContentsFilter(
-  tableOfContents: TableOfContentsApiResponse|null,
-) {
+export function createTableOfContentsFilter(tableOfContents: TableOfContentsApiResponse | null) {
   return runInAction(() => new TableOfContentsFilter(tableOfContents));
 }

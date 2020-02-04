@@ -1,18 +1,9 @@
-import
-{
-  action,
-  computed,
-  observable,
-  runInAction,
-} from 'mobx';
+import { action, computed, observable, runInAction } from 'mobx';
 // eslint-disable-next-line import/no-cycle
 import { TableOfContentsTree } from './table-of-contents-tree';
 
 export class TableOfContentsTreeNode {
-  constructor(
-    private tree: TableOfContentsTree,
-    public page: TableOfContentsPage,
-  ) {}
+  constructor(private tree: TableOfContentsTree, public page: TableOfContentsPage) {}
 
   get isHasChildPages(): boolean {
     return this.page.pages != null;

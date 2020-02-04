@@ -1,14 +1,7 @@
-import
-{
-  computed,
-  observable,
-  runInAction,
-} from 'mobx';
+import { computed, observable, runInAction } from 'mobx';
 
 export class TableOfContentsTreeAnchors {
-  constructor(
-    anchors: TableOfContentsAnchor[],
-  ) {
+  constructor(anchors: TableOfContentsAnchor[]) {
     this.list = anchors;
   }
 
@@ -21,8 +14,6 @@ export class TableOfContentsTreeAnchors {
   }
 }
 
-export function createTableOfContentsTreeAnchors(
-  anchors: TableOfContentsAnchor[],
-) {
+export function createTableOfContentsTreeAnchors(anchors: TableOfContentsAnchor[]) {
   return runInAction(() => new TableOfContentsTreeAnchors(anchors));
 }

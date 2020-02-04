@@ -1,0 +1,33 @@
+.item {
+
+  }
+
+.item[data-level="1"] {
+  margin-left: 16px;
+  }
+.item[data-level="2"] {
+  margin-left: 32px;
+  }
+.item[data-level="3"] {
+  margin-left: 48px;
+  }
+.item[data-level="4"] {
+  margin-left: 64px;
+  }
+.item[data-level="5"] {
+  margin-left: 80px;
+  }
+.item[data-level="6"] {
+  margin-left: 96px;
+  }
+.item[data-level="7"] {
+  margin-left: 112px;
+  }
+
+.selectedItem {
+  background: #f00;
+  }
+
+.parentSelectedItem {
+  background: #00FF00;
+  }

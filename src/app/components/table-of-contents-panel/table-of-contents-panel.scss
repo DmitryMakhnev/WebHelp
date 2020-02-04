@@ -3,6 +3,15 @@
 .tableOfContentsPanel {
   box-sizing: border-box;
   border-right: 1px solid $default-separator-color;
-  padding: $grid-module_6x $grid-module_8x;
-  overflow-y: auto;
+  //padding: $grid-module_6x $grid-module_8x;
+  display: flex;
+  flex-flow: column;
   }
+
+  .top {
+
+    }
+
+  .list {
+    flex-grow: 1;
+    }

@@ -1,10 +1,4 @@
-import React,
-{
-  FC,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import React, { FC, useContext, useEffect, useState } from 'react';
 import { observer } from 'mobx-react';
 import { TableOfContentsPanel } from '../../components/table-of-contents-panel/table-of-contents-panel';
 import { DataLayerConnectionContext } from '../../contexts/data-layer-connection.context';
@@ -19,16 +13,14 @@ export const TableOfContentsPanelHoc: FC<TableOfContentsPanelHOCProps> = observe
 
   const dataLayerConnection = useContext(DataLayerConnectionContext);
 
-  const [tableOfContentsViewModel] = useState(
-    () => createTableOfContentsPanelViewModel(
-      dataLayerConnection.tableOfContentsModel,
-    ),
+  const [tableOfContentsViewModel] = useState(() =>
+    createTableOfContentsPanelViewModel(dataLayerConnection.tableOfContentsModel),
   );
 
   useEffect(() => {
     console.log('hok run effect');
-    WEB_HELP_OUTSIDE_API.selectByPageId = pageId => tableOfContentsViewModel
-      .tree.selectByPageId(pageId, true);
+    WEB_HELP_OUTSIDE_API.selectByPageId = pageId =>
+      tableOfContentsViewModel.tree.selectByPageId(pageId, true);
     WEB_HELP_OUTSIDE_API.filterByText = text => tableOfContentsViewModel.tree.filterByText(text);
 
     dataLayerConnection.tableOfContentsFetchingController.fetch().catch(() => {

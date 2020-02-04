@@ -1,4 +1,3 @@
-
 interface FoundPages {
   pages: Record<TableOfContentsPageId, TableOfContentsPage>;
   pageIds: Set<TableOfContentsPageId>;
@@ -14,7 +13,8 @@ interface FoundPages {
 export function findPagesByText(
   pages: Record<TableOfContentsPageId, TableOfContentsPage>,
   text: string,
-): FoundPages|null {
+): FoundPages | null {
+  console.time('3');
   const transformedText = text.toLocaleLowerCase();
 
   // fin all matched pages ids
@@ -41,12 +41,18 @@ export function findPagesByText(
   const foundTopLevelPagesIds: TableOfContentsPageId[] = [];
   foundPageIds.forEach(pageId => {
     const page = pages[pageId];
-    foundPages[pageId] = page;
+    const newPage = { ...page };
+    if (newPage.pages) {
+      const newChildPages = newPage.pages.filter(childPageId => foundPageIds.has(childPageId));
+      newPage.pages = newChildPages.length ? newChildPages : undefined;
+    }
+    foundPages[pageId] = newPage;
     if (page.level === 0) {
       foundTopLevelPagesIds.push(page.id);
     }
   });
 
+  console.timeEnd('3');
   return {
     pages: foundPages,
     topLevelIds: foundTopLevelPagesIds,

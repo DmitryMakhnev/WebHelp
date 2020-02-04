@@ -1,4 +1,3 @@
-
 export function getUniqueValuesOfFieldOfAllPages<K extends keyof TableOfContentsPage>(
   pages: Record<TableOfContentsPageId, TableOfContentsPage>,
   key: K,
