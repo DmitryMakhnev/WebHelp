@@ -2,12 +2,14 @@ import React, { Component, FC } from 'react';
 import classNames from 'classnames';
 import { reaction } from 'mobx';
 import styles from './table-of-contents-list.scss';
-import { TableOfContentsPanelViewModel } from '../../higher-order-components/table-of-contents-panel/view-model/table-of-contents-panel.view-model';
 import { TableOfContentsListItem } from './item/table-of-contents-item';
+import { TableOfContentsTree2 } from '../../higher-order-components/table-of-contents-panel/view-model/tree-2/table-of-contents-tree-2';
+import { TableOfContentsPageViewRepresentation } from '../../higher-order-components/table-of-contents-panel/view-model/tree-2/table-of-contents-page-view-representation';
+import { ChildrenRepresentation } from '../../higher-order-components/table-of-contents-panel/view-model/tree-2/children-representation/children-representation';
 
 interface TableOfContentsListProps {
   className?: string;
-  viewModel: TableOfContentsPanelViewModel;
+  tree: TableOfContentsTree2;
 }
 
 interface TableOfContentsListState {
@@ -16,17 +18,20 @@ interface TableOfContentsListState {
 
 interface Chunk {
   id: number;
-  pages: TableOfContentsPage[];
+  pages: TableOfContentsPageViewRepresentation[];
 }
 
 let chunkId = 1;
 
 const ListRenderChunk: FC<{
-  pages: TableOfContentsPage[];
+  pages: TableOfContentsPageViewRepresentation[];
 }> = props => (
   <>
-    {props.pages.map(page => (
-      <TableOfContentsListItem page={page} key={page.id} />
+    {props.pages.map(pageViewRepresentation => (
+      <TableOfContentsListItem
+        pageViewRepresentation={pageViewRepresentation}
+        key={pageViewRepresentation.id}
+      />
     ))}
   </>
 );
@@ -46,29 +51,34 @@ export class TableOfContentsList extends Component<
     };
   }
 
+  renderList(childrenRepresentation: ChildrenRepresentation) {
+    const chunks: Chunk[] = [];
+
+    const chunkSize = 50;
+    const iMax = Math.floor(childrenRepresentation.children.length / chunkSize) + 1;
+    for (let i = 0; i !== iMax; i += 1) {
+      chunkId += 1;
+      chunks.push({
+        id: chunkId,
+        pages: childrenRepresentation.children.slice(chunkSize * i, chunkSize * (i + 1)),
+      });
+    }
+
+    this.storedChunks = chunks;
+
+    this.setState({
+      chunks: [chunks[0]],
+    });
+  }
+
   componentDidMount(): void {
     reaction(
-      () => this.props.viewModel.tree2.children,
+      () => this.props.tree.childrenRepresentation,
       children => {
-        const chunks: Chunk[] = [];
-
-        const chunkSize = 50;
-        const iMax = Math.floor(children.length / chunkSize) + 1;
-        for (let i = 0; i !== iMax; i += 1) {
-          chunkId += 1;
-          chunks.push({
-            id: chunkId,
-            pages: children.slice(chunkSize * i, chunkSize * (i + 1)),
-          });
-        }
-
-        this.storedChunks = chunks;
-
-        this.setState({
-          chunks: [chunks[0]],
-        });
+        this.renderList(children);
       },
     );
+    this.renderList(this.props.tree.childrenRepresentation);
   }
 
   setScrollContainer = (scrollContainer: HTMLDivElement) => {

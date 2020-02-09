@@ -14,7 +14,6 @@ export function findPagesByText(
   pages: Record<TableOfContentsPageId, TableOfContentsPage>,
   text: string,
 ): FoundPages | null {
-  console.time('3');
   const transformedText = text.toLocaleLowerCase();
 
   // fin all matched pages ids
@@ -52,7 +51,6 @@ export function findPagesByText(
     }
   });
 
-  console.timeEnd('3');
   return {
     pages: foundPages,
     topLevelIds: foundTopLevelPagesIds,

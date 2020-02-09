@@ -173,6 +173,7 @@ module.exports = {
         ],
       },
 
+      // TODO [dmitry.makhnev]: https://github.com/formatjs/react-intl/blob/master/docs/Getting-Started.md#esm-build
       {
         test: /\.tsx?$/,
         loader: 'ts-loader',

@@ -16,8 +16,10 @@ export class TableOfContentsPanelViewModel {
   }
 
   @computed
-  get tree2(): TableOfContentsTree2 {
-    return createTableOfContentsTree2(this.tableOfContentsModel.data);
+  get tree2(): TableOfContentsTree2 | null {
+    return this.tableOfContentsModel.data
+      ? createTableOfContentsTree2(this.tableOfContentsModel.data)
+      : null;
   }
 }
 

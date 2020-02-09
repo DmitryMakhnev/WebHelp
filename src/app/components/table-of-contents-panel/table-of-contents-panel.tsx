@@ -5,6 +5,8 @@ import styles from './table-of-contents-panel.scss';
 import { TableOfContentsList } from '../table-of-contents-list/table-of-contents-list';
 import { TableOfContentsPanelViewModel } from '../../higher-order-components/table-of-contents-panel/view-model/table-of-contents-panel.view-model';
 import { TableOfContentsFilter } from '../table-of-contents-filter/table-of-contents-filter';
+import { jsxIf } from '../../../lib/jsx/jsx-if';
+import { TableOfContentsTree2 } from '../../higher-order-components/table-of-contents-panel/view-model/tree-2/table-of-contents-tree-2';
 
 export interface TableOfContentsPanelProps {
   className?: string;
@@ -13,19 +15,27 @@ export interface TableOfContentsPanelProps {
 }
 
 export const TableOfContentsPanel: FC<TableOfContentsPanelProps> = observer(props => {
-  const tree = props.viewModel.tree;
-  const tree2 = props.viewModel.tree2;
+  const viewModel = props.viewModel;
+  const tree = viewModel.tree;
+  const tree2 = viewModel.tree2;
+
   return (
     <div className={classNames(styles.tableOfContentsPanel, props.className)}>
       <div className={styles.top}>
         {props.dataState}
-        <TableOfContentsFilter tree={tree2} />
-        {tree.currentAnchors.list.map(anchor => (
-          <div key={anchor.id}>{anchor.title}</div>
+        {jsxIf(tree2 != null, () => (
+          <>
+            <TableOfContentsFilter tree={tree2 as TableOfContentsTree2} />
+            {tree.currentAnchors.list.map(anchor => (
+              <div key={anchor.id}>{anchor.title}</div>
+            ))}
+            <hr />
+          </>
         ))}
-        <hr />
       </div>
-      <TableOfContentsList className={styles.list} viewModel={props.viewModel} />
+      {jsxIf(tree2 != null, () => (
+        <TableOfContentsList className={styles.list} tree={tree2 as TableOfContentsTree2} />
+      ))}
     </div>
   );
 });
