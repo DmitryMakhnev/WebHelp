@@ -7,6 +7,7 @@ import { TableOfContentsPanelViewModel } from '../../higher-order-components/tab
 import { TableOfContentsFilter } from '../table-of-contents-filter/table-of-contents-filter';
 import { jsxIf } from '../../../lib/jsx/jsx-if';
 import { TableOfContentsTree2 } from '../../higher-order-components/table-of-contents-panel/view-model/tree-2/table-of-contents-tree-2';
+import { TableOfContentsListItem } from '../table-of-contents-list/item/table-of-contents-item';
 
 export interface TableOfContentsPanelProps {
   className?: string;
@@ -21,6 +22,7 @@ export const TableOfContentsPanel: FC<TableOfContentsPanelProps> = observer(prop
 
   return (
     <div className={classNames(styles.tableOfContentsPanel, props.className)}>
+
       <div className={styles.top}>
         {props.dataState}
         {jsxIf(tree2 != null, () => (
@@ -33,8 +35,23 @@ export const TableOfContentsPanel: FC<TableOfContentsPanelProps> = observer(prop
           </>
         ))}
       </div>
+
       {jsxIf(tree2 != null, () => (
-        <TableOfContentsList className={styles.list} tree={tree2 as TableOfContentsTree2} />
+        <TableOfContentsList
+          className={styles.list}
+          tree={tree2 as TableOfContentsTree2}
+          renderItem={
+            representation => (
+              <TableOfContentsListItem
+                pageViewRepresentation={representation}
+                toggleSubPages={
+                  () => (tree2 as TableOfContentsTree2).toggleSubPages(representation)
+                }
+                key={representation.id}
+              />
+            )
+          }
+        />
       ))}
     </div>
   );

@@ -1,7 +1,7 @@
 export type ChildrenRepresentationModificationType =
   | 'INITIAL'
-  | 'OPENED'
-  | 'CLOSED'
+  | 'CHILDREN_APPENDED'
+  | 'CHILDREN_REMOVED'
   | 'SELF_SELECTED'
   | 'OUTSIDE_SELECTED'
   | 'FILTERED'

@@ -36,13 +36,13 @@ export function createFilteredChildrenRepresentation(
   // manage open states
   sortedPageViewRepresentations.forEach(pageViewRepresentation => {
     const hasChildrenForCurrentQuery = pageViewRepresentation.currentChildren.size !== 0;
-    pageViewRepresentation.setIsOpen(hasChildrenForCurrentQuery);
+    pageViewRepresentation.setIsSubPagesShowed(hasChildrenForCurrentQuery);
   });
 
   return {
     modificationType: 'FILTERED',
     children: foundAndSortedPageViewRepresentations,
-    subPart: foundAndSortedPageViewRepresentations,
-    bearingPageId: null,
+    modifyingChildren: foundAndSortedPageViewRepresentations,
+    bearingItemId: null,
   };
 }

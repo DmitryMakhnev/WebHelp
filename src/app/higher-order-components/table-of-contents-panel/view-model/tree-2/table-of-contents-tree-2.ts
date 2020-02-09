@@ -11,6 +11,9 @@ import {
   createPageViewRepresentationsByIdIndex,
   TableOfContentsPageViewRepresentationById,
 } from './utils/create-page-view-representations-by-id-index';
+import { createChildrenAppendedChildrenRepresentation } from './children-representation/create-children-appended-children-representation';
+import { createChildrenRemovedChildrenRepresentation } from './children-representation/create-children-removed-children-representation';
+import { restoreTableOfContentsViewRepresentationChildren } from './utils/restore-table-of-contents-view-representation-children';
 
 export class TableOfContentsTree2 {
   constructor(private readonly tableOfContents: TableOfContentsApiResponse) {
@@ -40,6 +43,35 @@ export class TableOfContentsTree2 {
   private isInSearchMode = false;
 
   @action.bound
+  showSubPages(pageViewRepresentation: TableOfContentsPageViewRepresentation) {
+    pageViewRepresentation.setIsSubPagesShowed(true);
+    this.childrenRepresentation = createChildrenAppendedChildrenRepresentation(
+      this.childrenRepresentation,
+      pageViewRepresentation,
+      this.pageViewRepresentationsById,
+    );
+  }
+
+  @action.bound
+  hideSubPages(pageViewRepresentation: TableOfContentsPageViewRepresentation) {
+    pageViewRepresentation.setIsSubPagesShowed(false);
+    this.childrenRepresentation = createChildrenRemovedChildrenRepresentation(
+      this.childrenRepresentation,
+      pageViewRepresentation,
+      this.pageViewRepresentationsById,
+    );
+  }
+
+  @action.bound
+  toggleSubPages(pageViewRepresentation: TableOfContentsPageViewRepresentation) {
+    if (pageViewRepresentation.isSubPagesShowed) {
+      this.hideSubPages(pageViewRepresentation);
+    } else {
+      this.showSubPages(pageViewRepresentation);
+    }
+  }
+
+  @action.bound
   find(textQuery: string) {
     if (textQuery === this.textQuery) {
       return;
@@ -65,6 +97,9 @@ export class TableOfContentsTree2 {
         break;
       case 'STOP':
         this.isInSearchMode = false;
+        restoreTableOfContentsViewRepresentationChildren(
+          this.sortedPageViewRepresentations,
+        );
         this.childrenRepresentation = createRestoredChildrenRepresentation(
           this.childrenRepresentationBeforeSearch as ChildrenRepresentation,
         );

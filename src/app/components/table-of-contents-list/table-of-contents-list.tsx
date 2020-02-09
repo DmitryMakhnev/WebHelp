@@ -1,8 +1,7 @@
-import React, { Component, FC } from 'react';
+import React, { Component, FC, ReactNode } from 'react';
 import classNames from 'classnames';
 import { reaction } from 'mobx';
 import styles from './table-of-contents-list.scss';
-import { TableOfContentsListItem } from './item/table-of-contents-item';
 import { TableOfContentsTree2 } from '../../higher-order-components/table-of-contents-panel/view-model/tree-2/table-of-contents-tree-2';
 import { TableOfContentsPageViewRepresentation } from '../../higher-order-components/table-of-contents-panel/view-model/tree-2/table-of-contents-page-view-representation';
 import { ChildrenRepresentation } from '../../higher-order-components/table-of-contents-panel/view-model/tree-2/children-representation/children-representation';
@@ -10,6 +9,7 @@ import { ChildrenRepresentation } from '../../higher-order-components/table-of-c
 interface TableOfContentsListProps {
   className?: string;
   tree: TableOfContentsTree2;
+  renderItem: (representation: TableOfContentsPageViewRepresentation) => ReactNode,
 }
 
 interface TableOfContentsListState {
@@ -25,13 +25,11 @@ let chunkId = 1;
 
 const ListRenderChunk: FC<{
   pages: TableOfContentsPageViewRepresentation[];
+  renderItem: (representation: TableOfContentsPageViewRepresentation) => ReactNode,
 }> = props => (
   <>
     {props.pages.map(pageViewRepresentation => (
-      <TableOfContentsListItem
-        pageViewRepresentation={pageViewRepresentation}
-        key={pageViewRepresentation.id}
-      />
+      props.renderItem(pageViewRepresentation)
     ))}
   </>
 );
@@ -42,7 +40,7 @@ export class TableOfContentsList extends Component<
   TableOfContentsListProps,
   TableOfContentsListState
 > {
-  storedChunks: Chunk[] = [];
+  private storedChunks: Chunk[] = [];
 
   constructor(props: TableOfContentsListProps) {
     super(props);
@@ -74,8 +72,8 @@ export class TableOfContentsList extends Component<
   componentDidMount(): void {
     reaction(
       () => this.props.tree.childrenRepresentation,
-      children => {
-        this.renderList(children);
+      childrenRepresentation => {
+        this.renderList(childrenRepresentation);
       },
     );
     this.renderList(this.props.tree.childrenRepresentation);
@@ -100,6 +98,7 @@ export class TableOfContentsList extends Component<
 
   render() {
     const props = this.props;
+    const renderItem = this.props.renderItem;
     return (
       <div
         className={classNames(styles.tableOfContentsList, props.className)}
@@ -107,7 +106,11 @@ export class TableOfContentsList extends Component<
       >
         <div className={styles.inner}>
           {this.state.chunks.map(chunk => (
-            <ListRenderChunk pages={chunk.pages} key={chunk.id} />
+            <ListRenderChunk
+              pages={chunk.pages}
+              key={chunk.id}
+              renderItem={renderItem}
+            />
           ))}
         </div>
       </div>

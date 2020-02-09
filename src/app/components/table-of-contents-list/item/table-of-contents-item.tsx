@@ -4,6 +4,7 @@ import { TableOfContentsPageViewRepresentation } from '../../../higher-order-com
 
 interface SimpleNodeProps {
   pageViewRepresentation: TableOfContentsPageViewRepresentation;
+  toggleSubPages: () => void
 }
 
 const noop = () => {};
@@ -17,7 +18,7 @@ export const TableOfContentsListItem: FC<SimpleNodeProps> = props => {
         {page.title}
       </button>
       {pageViewRepresentation.hasChildren ? (
-        <button type="button" onClick={noop}>
+        <button type="button" onClick={props.toggleSubPages}>
           toggle
         </button>
       ) : null}

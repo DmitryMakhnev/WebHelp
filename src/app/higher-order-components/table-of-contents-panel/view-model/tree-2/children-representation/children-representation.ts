@@ -4,6 +4,6 @@ import { TableOfContentsPageViewRepresentation } from '../table-of-contents-page
 export interface ChildrenRepresentation {
   modificationType: ChildrenRepresentationModificationType;
   children: TableOfContentsPageViewRepresentation[];
-  subPart: TableOfContentsPageViewRepresentation[];
-  bearingPageId: TableOfContentsPageId | null;
+  modifyingChildren: TableOfContentsPageViewRepresentation[];
+  bearingItemId: TableOfContentsPageId | null;
 }

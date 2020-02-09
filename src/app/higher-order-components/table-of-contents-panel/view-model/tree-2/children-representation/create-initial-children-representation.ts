@@ -13,7 +13,7 @@ export function createInitialChildrenRepresentation(
   return {
     modificationType: 'INITIAL',
     children,
-    subPart: children,
-    bearingPageId: null,
+    modifyingChildren: children,
+    bearingItemId: null,
   };
 }

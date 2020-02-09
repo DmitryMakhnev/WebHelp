@@ -1,5 +1,9 @@
+
 export class TableOfContentsPageViewRepresentation {
-  constructor(public page: TableOfContentsPage, public sortedIndex: number) {
+  constructor(
+    public page: TableOfContentsPage,
+    public sortedIndex: number,
+  ) {
     const children = new Set<TableOfContentsPageId>();
 
     this.id = page.id;
@@ -27,10 +31,10 @@ export class TableOfContentsPageViewRepresentation {
     this.currentChildren = currentChildren;
   }
 
-  isOpen: boolean = false;
+  isSubPagesShowed: boolean = false;
 
-  setIsOpen(isOpen: boolean) {
-    this.isOpen = isOpen;
+  setIsSubPagesShowed(isSubPagesShowed: boolean) {
+    this.isSubPagesShowed = isSubPagesShowed;
   }
 
   isSelected = false;
