@@ -1,6 +1,6 @@
 import { action, observable, runInAction } from 'mobx';
 import { sortTableOfContentsInputDataForTree } from './utils/sort-table-of-contents-input-data-for-tree';
-import { ChildrenRepresentation } from './children-representation/children-representation';
+import { TableOfContentsChildrenModificationRepresentation } from './children-representation/table-of-contents-children-modification-representation';
 import { createInitialChildrenRepresentation } from './children-representation/create-initial-children-representation';
 import { createFilteredChildrenRepresentation } from './children-representation/create-filtered-children-representation';
 import { createRestoredChildrenRepresentation } from './children-representation/create-restored-children-representation';
@@ -14,8 +14,14 @@ import {
 import { createChildrenAppendedChildrenRepresentation } from './children-representation/create-children-appended-children-representation';
 import { createChildrenRemovedChildrenRepresentation } from './children-representation/create-children-removed-children-representation';
 import { restoreTableOfContentsViewRepresentationChildren } from './utils/restore-table-of-contents-view-representation-children';
+import { ChunkedRenderListChildrenRepresentationHolder } from '../../../../components/chunked-render-list/chunked-render-list-children-representation-holder';
 
-export class TableOfContentsTree2 {
+export class TableOfContentsTree2
+  implements
+    ChunkedRenderListChildrenRepresentationHolder<
+      TableOfContentsPageViewRepresentation,
+      TableOfContentsChildrenModificationRepresentation
+    > {
   constructor(private readonly tableOfContents: TableOfContentsApiResponse) {
     const sortedPages = sortTableOfContentsInputDataForTree(tableOfContents);
     this.sortedPageViewRepresentations = createPageViewRepresentations(sortedPages);
@@ -32,10 +38,11 @@ export class TableOfContentsTree2 {
 
   private pageViewRepresentationsById: TableOfContentsPageViewRepresentationById;
 
-  private childrenRepresentationBeforeSearch: ChildrenRepresentation | null = null;
+  // eslint-disable-next-line max-len
+  private childrenRepresentationBeforeSearch: TableOfContentsChildrenModificationRepresentation | null = null;
 
   @observable.ref
-  childrenRepresentation: ChildrenRepresentation;
+  childrenRepresentation: TableOfContentsChildrenModificationRepresentation;
 
   @observable.ref
   textQuery: string = '';
@@ -97,11 +104,11 @@ export class TableOfContentsTree2 {
         break;
       case 'STOP':
         this.isInSearchMode = false;
-        restoreTableOfContentsViewRepresentationChildren(
-          this.sortedPageViewRepresentations,
-        );
+        restoreTableOfContentsViewRepresentationChildren(this.sortedPageViewRepresentations);
         this.childrenRepresentation = createRestoredChildrenRepresentation(
-          this.childrenRepresentationBeforeSearch as ChildrenRepresentation,
+          this
+            // eslint-disable-next-line max-len
+            .childrenRepresentationBeforeSearch as TableOfContentsChildrenModificationRepresentation,
         );
         this.childrenRepresentationBeforeSearch = null;
         break;

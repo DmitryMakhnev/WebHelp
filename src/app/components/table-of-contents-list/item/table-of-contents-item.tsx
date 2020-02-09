@@ -4,7 +4,7 @@ import { TableOfContentsPageViewRepresentation } from '../../../higher-order-com
 
 interface SimpleNodeProps {
   pageViewRepresentation: TableOfContentsPageViewRepresentation;
-  toggleSubPages: () => void
+  toggleSubPages: () => void;
 }
 
 const noop = () => {};

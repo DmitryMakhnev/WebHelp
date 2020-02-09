@@ -1,4 +1,4 @@
-import { ChildrenRepresentation } from './children-representation';
+import { TableOfContentsChildrenModificationRepresentation } from './table-of-contents-children-modification-representation';
 import { TableOfContentsPageViewRepresentation } from '../table-of-contents-page-view-representation';
 import { findPageIdsForFilter } from '../utils/find-page-ids-for-filter';
 import { TableOfContentsPageViewRepresentationById } from '../utils/create-page-view-representations-by-id-index';
@@ -8,7 +8,7 @@ export function createFilteredChildrenRepresentation(
   sortedPageViewRepresentations: TableOfContentsPageViewRepresentation[],
   pageViewRepresentationsById: TableOfContentsPageViewRepresentationById,
   textQuery: string,
-): ChildrenRepresentation {
+): TableOfContentsChildrenModificationRepresentation {
   // search
   const foundPageIds = findPageIdsForFilter(
     sortedPageViewRepresentations,

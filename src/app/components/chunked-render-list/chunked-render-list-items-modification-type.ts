@@ -1,4 +1,4 @@
-export type ChildrenRepresentationModificationType =
+export type ChunkedRenderListItemsModificationType =
   | 'INITIAL'
   | 'CHILDREN_APPENDED'
   | 'CHILDREN_REMOVED'

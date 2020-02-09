@@ -1,12 +1,12 @@
-import { ChildrenRepresentation } from './children-representation';
+import { TableOfContentsChildrenModificationRepresentation } from './table-of-contents-children-modification-representation';
 import { TableOfContentsPageViewRepresentation } from '../table-of-contents-page-view-representation';
 import { TableOfContentsPageViewRepresentationById } from '../utils/create-page-view-representations-by-id-index';
 
 export function createChildrenAppendedChildrenRepresentation(
-  currentChildrenRepresentation: ChildrenRepresentation,
+  currentChildrenRepresentation: TableOfContentsChildrenModificationRepresentation,
   currentPageViewRepresentation: TableOfContentsPageViewRepresentation,
   pageViewRepresentationsById: TableOfContentsPageViewRepresentationById,
-): ChildrenRepresentation {
+): TableOfContentsChildrenModificationRepresentation {
   const appendedChildren: TableOfContentsPageViewRepresentation[] = [];
 
   currentPageViewRepresentation.currentChildren.forEach(pageId => {
@@ -16,10 +16,9 @@ export function createChildrenAppendedChildrenRepresentation(
   });
 
   const currentChildrenRepresentationChildren = currentChildrenRepresentation.children;
-  const currentPageViewRepresentationIndex = currentChildrenRepresentationChildren
-    .findIndex(
-      pageViewRepresentation => pageViewRepresentation === currentPageViewRepresentation,
-    );
+  const currentPageViewRepresentationIndex = currentChildrenRepresentationChildren.findIndex(
+    pageViewRepresentation => pageViewRepresentation === currentPageViewRepresentation,
+  );
 
   let newChildren: TableOfContentsPageViewRepresentation[];
   if (currentPageViewRepresentationIndex === currentChildrenRepresentationChildren.length - 1) {

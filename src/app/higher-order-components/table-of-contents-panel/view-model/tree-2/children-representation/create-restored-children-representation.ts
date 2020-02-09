@@ -1,15 +1,14 @@
-import { ChildrenRepresentation } from './children-representation';
+import { TableOfContentsChildrenModificationRepresentation } from './table-of-contents-children-modification-representation';
 
 export function createRestoredChildrenRepresentation(
-  childrenRepresentation: ChildrenRepresentation,
-): ChildrenRepresentation {
+  childrenRepresentation: TableOfContentsChildrenModificationRepresentation,
+): TableOfContentsChildrenModificationRepresentation {
   // sync showed pages states
   const children = childrenRepresentation.children;
   children.forEach((child, index) => {
     const nextChildren = children[index + 1];
-    const isSubPagesShowed = child.hasChildren
-      && nextChildren
-      && child.currentChildren.has(nextChildren.id);
+    const isSubPagesShowed =
+      child.hasChildren && nextChildren && child.currentChildren.has(nextChildren.id);
     child.setIsSubPagesShowed(isSubPagesShowed);
   });
 
