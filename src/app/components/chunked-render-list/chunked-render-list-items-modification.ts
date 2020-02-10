@@ -1,8 +1,8 @@
 import { ChunkedRenderListItemsModificationType } from './chunked-render-list-items-modification-type';
-import { ChunkedRenderListItemRepresentation } from './chunked-render-list-item-representation';
+import { ChunkedRenderListItem } from './chunked-render-list-item';
 
-export interface ChunkedRenderListItemsModificationRepresentation<
-  T extends ChunkedRenderListItemRepresentation
+export interface ChunkedRenderListItemsModification<
+  T extends ChunkedRenderListItem
 > {
   modificationType: ChunkedRenderListItemsModificationType;
   children: T[];

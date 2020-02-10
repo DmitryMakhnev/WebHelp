@@ -270,7 +270,6 @@ describe('TablesOfContentTree', () => {
         throw new IncorrectFixtureError("Don't have any page on third level with children page");
       }
       const textForFiltration = thirdLevelPage.title;
-      console.log(textForFiltration);
       const filter = createTableOfContentsFilter(response);
       filter.filterByText(textForFiltration);
       const pureFiltrationResult = filter.filtrationResult;

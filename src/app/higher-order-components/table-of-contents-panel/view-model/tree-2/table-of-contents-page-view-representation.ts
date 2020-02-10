@@ -1,6 +1,6 @@
-import { ChunkedRenderListItemRepresentation } from '../../../../components/chunked-render-list/chunked-render-list-item-representation';
+import { ChunkedRenderListItem } from '../../../../components/chunked-render-list/chunked-render-list-item';
 
-export class TableOfContentsPageViewRepresentation implements ChunkedRenderListItemRepresentation {
+export class TableOfContentsPageViewRepresentation implements ChunkedRenderListItem {
   constructor(public page: TableOfContentsPage, public sortedIndex: number) {
     const children = new Set<TableOfContentsPageId>();
 

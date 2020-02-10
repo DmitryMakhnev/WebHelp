@@ -14,21 +14,21 @@ import {
 import { createChildrenAppendedChildrenRepresentation } from './children-representation/create-children-appended-children-representation';
 import { createChildrenRemovedChildrenRepresentation } from './children-representation/create-children-removed-children-representation';
 import { restoreTableOfContentsViewRepresentationChildren } from './utils/restore-table-of-contents-view-representation-children';
-import { ChunkedRenderListChildrenRepresentationHolder } from '../../../../components/chunked-render-list/chunked-render-list-children-representation-holder';
+import { ChunkedRenderListModificationHolder } from '../../../../components/chunked-render-list/chunked-render-list-modification-holder';
 
 export class TableOfContentsTree2
-  implements
-    ChunkedRenderListChildrenRepresentationHolder<
-      TableOfContentsPageViewRepresentation,
-      TableOfContentsChildrenModificationRepresentation
-    > {
+implements
+  ChunkedRenderListModificationHolder<
+    TableOfContentsPageViewRepresentation,
+    TableOfContentsChildrenModificationRepresentation
+  > {
   constructor(private readonly tableOfContents: TableOfContentsApiResponse) {
     const sortedPages = sortTableOfContentsInputDataForTree(tableOfContents);
     this.sortedPageViewRepresentations = createPageViewRepresentations(sortedPages);
     this.pageViewRepresentationsById = createPageViewRepresentationsByIdIndex(
       this.sortedPageViewRepresentations,
     );
-    this.childrenRepresentation = createInitialChildrenRepresentation(
+    this.childrenModification = createInitialChildrenRepresentation(
       tableOfContents,
       this.pageViewRepresentationsById,
     );
@@ -42,7 +42,7 @@ export class TableOfContentsTree2
   private childrenRepresentationBeforeSearch: TableOfContentsChildrenModificationRepresentation | null = null;
 
   @observable.ref
-  childrenRepresentation: TableOfContentsChildrenModificationRepresentation;
+  childrenModification: TableOfContentsChildrenModificationRepresentation;
 
   @observable.ref
   textQuery: string = '';
@@ -52,8 +52,8 @@ export class TableOfContentsTree2
   @action.bound
   showSubPages(pageViewRepresentation: TableOfContentsPageViewRepresentation) {
     pageViewRepresentation.setIsSubPagesShowed(true);
-    this.childrenRepresentation = createChildrenAppendedChildrenRepresentation(
-      this.childrenRepresentation,
+    this.childrenModification = createChildrenAppendedChildrenRepresentation(
+      this.childrenModification,
       pageViewRepresentation,
       this.pageViewRepresentationsById,
     );
@@ -62,8 +62,8 @@ export class TableOfContentsTree2
   @action.bound
   hideSubPages(pageViewRepresentation: TableOfContentsPageViewRepresentation) {
     pageViewRepresentation.setIsSubPagesShowed(false);
-    this.childrenRepresentation = createChildrenRemovedChildrenRepresentation(
-      this.childrenRepresentation,
+    this.childrenModification = createChildrenRemovedChildrenRepresentation(
+      this.childrenModification,
       pageViewRepresentation,
       this.pageViewRepresentationsById,
     );
@@ -88,15 +88,15 @@ export class TableOfContentsTree2
     switch (resolveSearchAction(textQuery, this.isInSearchMode)) {
       case 'START':
         this.isInSearchMode = true;
-        this.childrenRepresentationBeforeSearch = this.childrenRepresentation;
-        this.childrenRepresentation = createFilteredChildrenRepresentation(
+        this.childrenRepresentationBeforeSearch = this.childrenModification;
+        this.childrenModification = createFilteredChildrenRepresentation(
           this.sortedPageViewRepresentations,
           this.pageViewRepresentationsById,
           textQuery,
         );
         break;
       case 'CONTINUE':
-        this.childrenRepresentation = createFilteredChildrenRepresentation(
+        this.childrenModification = createFilteredChildrenRepresentation(
           this.sortedPageViewRepresentations,
           this.pageViewRepresentationsById,
           textQuery,
@@ -105,7 +105,7 @@ export class TableOfContentsTree2
       case 'STOP':
         this.isInSearchMode = false;
         restoreTableOfContentsViewRepresentationChildren(this.sortedPageViewRepresentations);
-        this.childrenRepresentation = createRestoredChildrenRepresentation(
+        this.childrenModification = createRestoredChildrenRepresentation(
           this
             // eslint-disable-next-line max-len
             .childrenRepresentationBeforeSearch as TableOfContentsChildrenModificationRepresentation,

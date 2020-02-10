@@ -1,14 +1,14 @@
-import { ChunkedRenderListItemRepresentation } from '../chunked-render-list-item-representation';
+import { ChunkedRenderListItem } from '../chunked-render-list-item';
 
-export interface ChunkedRenderListItemsChunkModel<T extends ChunkedRenderListItemRepresentation> {
-  id: number;
+export interface ChunkedRenderListItemsChunkModel<T extends ChunkedRenderListItem> {
+  id: string;
   items: T[];
   itemIndexesById: Map<string, number>;
 }
 
 export function createChunkedRenderListItemsChunkModel<
-  T extends ChunkedRenderListItemRepresentation
->(id: number, items: T[]): ChunkedRenderListItemsChunkModel<T> {
+  T extends ChunkedRenderListItem
+>(id: string, items: T[]): ChunkedRenderListItemsChunkModel<T> {
   const itemIndexesById = new Map<string, number>();
   items.forEach((item, i) => {
     itemIndexesById.set(item.id, i);
