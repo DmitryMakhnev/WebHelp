@@ -21,6 +21,7 @@ export function createChildrenRemovedChildrenRepresentation(
     children => children === currentPageViewRepresentation,
   );
   // it means that we remove children from current representation to end of list
+  // TODO [dmitry.makhnev]: tests tests tests
   if (allShowedChildrenIds.has(currentChildren[currentChildren.length - 1].id)) {
     newChildren = currentChildren.slice(0, indexOfRemovingRepresentation + 1);
     removingChildren = currentChildren.slice(
@@ -45,7 +46,7 @@ export function createChildrenRemovedChildrenRepresentation(
       .slice(0, indexOfRemovingRepresentation + 1)
       .concat(currentChildren.slice(lastRemovingRepresentationIndex + 1, currentChildren.length));
     removingChildren = currentChildren.slice(
-      indexOfRemovingRepresentation + 2,
+      indexOfRemovingRepresentation + 1,
       lastRemovingRepresentationIndex + 1,
     );
   }

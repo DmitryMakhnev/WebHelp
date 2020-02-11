@@ -26,7 +26,7 @@ export function buildChunksForAppendRender<IT extends ChunkedRenderListItem,
   );
   const notRenderedChunksBeforeRenderedChunks = prevAllChunks.slice(0, indexOfFirstRenderedChunk);
   const notRenderedChunksAfterRenderedChunks = prevAllChunks.slice(
-    indexOfLastRenderedChunk + 2, prevAllChunks.length,
+    indexOfLastRenderedChunk + 2,
   );
 
   // find chunks before and after rendered
@@ -40,14 +40,12 @@ export function buildChunksForAppendRender<IT extends ChunkedRenderListItem,
   );
   const renderedChunksAfterChunkWithAppend = prevRenderedChunks.slice(
     indexOfChunkWhereAppendIs + 1,
-    prevRenderedChunks.length,
   );
 
   // rebuild chunk where append is
   const chunkWhereAppendIs = prevRenderedChunks[indexOfChunkWhereAppendIs];
-  const indexOfItemForAddingInChunk = chunkWhereAppendIs.items.findIndex(
-    item => item.id === itemAfterAppendIs,
-  );
+  const indexOfItemForAddingInChunk = chunkWhereAppendIs.itemIndexesById
+    .get(itemAfterAppendIs) as number;
   const newChunkWithItemsBeforeAppend = createChunkedRenderListItemsChunkModel(
     getNewChunkId(),
     chunkWhereAppendIs.items.slice(0, indexOfItemForAddingInChunk + 1),
@@ -56,7 +54,6 @@ export function buildChunksForAppendRender<IT extends ChunkedRenderListItem,
     getNewChunkId(),
     chunkWhereAppendIs.items.slice(
       indexOfItemForAddingInChunk + 1,
-      chunkWhereAppendIs.items.length,
     ),
   );
 
@@ -107,7 +104,7 @@ export function buildChunksForAppendRender<IT extends ChunkedRenderListItem,
 
         // in this place we have render hole
         // it's hole for building animation
-        // and we must process this hole during renderer after animation
+        // and after animation list must fix this hole before first chunk rebuilding
 
         newChunkWithItemsAfterItemForAppend,
         renderedChunksAfterChunkWithAppend,

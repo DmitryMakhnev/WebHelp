@@ -10,11 +10,39 @@ import { ChunkedRenderListModificationHolder } from './chunked-render-list-modif
 import { buildChunksForFullRerender } from './chunks/build-chunks-for-full-rerender';
 import { ChunkedRenderListItemsChunksBuildResult } from './chunks/chunked-render-list-items-chunks-build-result';
 import { buildChunksForAppendRender } from './chunks/build-chunks-for-append-render';
-import { chunkIdsFactory } from './chunks/chunk-id-factory';
+import { createChunkId } from './chunks/chunk-id-factory';
 import { ChunkedListBuildInAnimatedSubPart } from './animations/build-in-animated-sub-part/chunked-list-build-in-animated-sub-part';
+import { buildChunksForRemovedRerender } from './chunks/build-chunks-for-removed-render';
+import { ChunkedListBuildOutAnimatedSubPart } from './animations/build-out-animated-sub-part/chunked-list-build-out-animated-sub-part';
 
 const DEFAULT_GAP_BEFORE_SCROLL_END_CHECKING = 100;
 const DEFAULT_LIST_ITEMS_CHUNK_SIZE = 50;
+
+function noop() {}
+
+function putChunkAfterChunkWithItemWithId<IT extends ChunkedRenderListItem>(
+  chunks: ChunkedRenderListItemsChunkModel<IT>[],
+  chunk: ChunkedRenderListItemsChunkModel<IT>,
+  itemId: string,
+) {
+  const findChunkWithItemIndex = chunks.findIndex(
+    chunkFromChunks => chunkFromChunks.itemIndexesById.has(itemId),
+  );
+  return chunks.slice(0, findChunkWithItemIndex + 1)
+    .concat(
+      chunk,
+      chunks.slice(findChunkWithItemIndex + 1),
+    );
+}
+
+function removeChunkFromChunks<IT extends ChunkedRenderListItem>(
+  chunks: ChunkedRenderListItemsChunkModel<IT>[],
+  chunk: ChunkedRenderListItemsChunkModel<IT>,
+): ChunkedRenderListItemsChunkModel<IT>[] {
+  return chunks.filter(
+    chunkFromChunks => chunkFromChunks !== chunk,
+  );
+}
 
 interface ChunkedRenderListProps<
   IT extends ChunkedRenderListItem,
@@ -31,8 +59,6 @@ interface ChunkedRenderListState<T extends ChunkedRenderListItem> {
   chunks: ChunkedRenderListItemsChunkModel<T>[];
 }
 
-function noop() {}
-
 export class ChunkedRenderList<
   IT extends ChunkedRenderListItem,
   MT extends ChunkedRenderListItemsModification<IT>
@@ -44,6 +70,10 @@ export class ChunkedRenderList<
   private allAppendChunks: ChunkedRenderListItemsChunkModel<IT>[]|undefined;
 
   private isDuringAppendingAnimation = false;
+
+  private buildOutChunk: ChunkedRenderListItemsChunkModel<IT>|undefined;
+
+  private isDuringRemovingAnimation = false;
 
   private scrollContainer: HTMLDivElement|undefined;
 
@@ -90,16 +120,18 @@ export class ChunkedRenderList<
   private rebuildChunks(childrenRepresentation: MT) {
     // chunks rebuild
     let chunksBuildingResult: ChunkedRenderListItemsChunksBuildResult<IT>;
+    let chunksForRender: ChunkedRenderListItemsChunkModel<IT>[];
 
     switch (childrenRepresentation.modificationType) {
       case 'CHILDREN_APPENDED':
         chunksBuildingResult = buildChunksForAppendRender(
-          chunkIdsFactory,
+          createChunkId,
           this.resolvedChunkSize,
           this.state.chunks,
           this.storedChunks,
           childrenRepresentation,
         );
+        chunksForRender = chunksBuildingResult.chunksForRender;
         // save extra information
         this.buildInChunk = chunksBuildingResult.mainInteractionChunk;
         if (chunksBuildingResult.allInteractionChunks &&
@@ -111,19 +143,38 @@ export class ChunkedRenderList<
         this.isDuringAppendingAnimation = true;
         break;
       // base case is full rerender
+      case 'CHILDREN_REMOVED':
+        chunksBuildingResult = buildChunksForRemovedRerender(
+          createChunkId,
+          this.resolvedChunkSize,
+          this.state.chunks,
+          this.storedChunks,
+          childrenRepresentation,
+        );
+        // put removing chunk into rendered chunks
+        chunksForRender = putChunkAfterChunkWithItemWithId(
+          chunksBuildingResult.chunksForRender,
+          chunksBuildingResult.mainInteractionChunk as ChunkedRenderListItemsChunkModel<IT>,
+          childrenRepresentation.bearingItemId as string,
+        );
+        this.buildOutChunk = chunksBuildingResult.mainInteractionChunk;
+        // start animation
+        this.isDuringRemovingAnimation = true;
+        break;
       default:
         chunksBuildingResult = buildChunksForFullRerender(
-          chunkIdsFactory,
+          createChunkId,
           this.resolvedChunkSize,
           childrenRepresentation,
         );
+        chunksForRender = chunksBuildingResult.chunksForRender;
         break;
     }
 
     this.allRequiredChunksWasRendered = false;
     this.storedChunks = chunksBuildingResult.chunks;
 
-    this.renderChunks(chunksBuildingResult.chunksForRender);
+    this.renderChunks(chunksForRender);
   }
 
   private renderChunks(chunks: ChunkedRenderListItemsChunkModel<IT>[]) {
@@ -131,7 +182,7 @@ export class ChunkedRenderList<
       {
         chunks,
       },
-      this.isDuringAppendingAnimation
+      this.isDuringAppendingAnimation || this.isDuringRemovingAnimation
         ? noop
         : this.scheduleRequiredNotBuiltChunksChecking,
     );
@@ -196,11 +247,29 @@ export class ChunkedRenderList<
     if (this.isDuringAppendingAnimation) {
       this.cleanAppendChunksAnimation();
     }
+    if (this.isDuringRemovingAnimation) {
+      this.cleanRemovedChunksAnimation();
+    }
   }
 
   private cleanAppendChunksAnimation() {
     this.isDuringAppendingAnimation = false;
     this.buildInChunk = undefined;
+  }
+
+  private cleanRemovedChunksAnimation(isForce: boolean = true) {
+    this.isDuringRemovingAnimation = false;
+    const buildOutChunk = this.buildOutChunk;
+    this.buildOutChunk = undefined;
+    if (buildOutChunk && isForce) {
+      // remove built out chunk from rendered chunks in state
+      // I know what I do
+      // eslint-disable-next-line react/no-access-state-in-setstate
+      const renderedChunksWithout = removeChunkFromChunks(this.state.chunks, buildOutChunk);
+      this.setState({
+        chunks: renderedChunksWithout,
+      });
+    }
   }
 
   private getChunksForNextRender(): ChunkedRenderListItemsChunkModel<IT>[]|undefined {
@@ -212,8 +281,15 @@ export class ChunkedRenderList<
     return undefined;
   }
 
-  private onBuildAnimationEnd = () => {
+  private onBuildInAnimationEnd = () => {
     this.cleanAppendChunksAnimation();
+
+    // run force rerender for updating chunks after animation
+    this.forceUpdate(this.scheduleRequiredNotBuiltChunksChecking);
+  };
+
+  private onBuildOutAnimationEnd = () => {
+    this.cleanRemovedChunksAnimation();
 
     // run force rerender for updating chunks after animation
     this.forceUpdate(this.scheduleRequiredNotBuiltChunksChecking);
@@ -241,6 +317,8 @@ export class ChunkedRenderList<
     }
     if (scrollContainer) {
       this.scrollContainer = scrollContainer;
+      // think about management by react
+      // think about `passive` flag
       scrollContainer.addEventListener('scroll', this.scrollListener);
     }
   };
@@ -256,24 +334,35 @@ export class ChunkedRenderList<
     return (
       <div className={classNames(styles.root, props.className)} ref={this.setScrollContainer}>
         <div className={styles.inner} ref={this.setInnerContainer}>
-          {this.state.chunks.map(chunk => (
-            chunk === this.buildInChunk
-              ? (
+          {this.state.chunks.map(chunk => {
+            if (chunk === this.buildInChunk) {
+              return (
                 <ChunkedListBuildInAnimatedSubPart
                   items={chunk.items}
                   key={`${chunk.id}_build-in-animation`}
                   renderItem={renderItem}
-                  onAnimationEnd={this.onBuildAnimationEnd}
+                  onAnimationEnd={this.onBuildInAnimationEnd}
                 />
-              )
-              : (
-                <ChunkedRenderListItemsChunk<IT>
+              );
+            // eslint-disable-next-line no-else-return
+            } else if (chunk === this.buildOutChunk) {
+              return (
+                <ChunkedListBuildOutAnimatedSubPart
                   items={chunk.items}
-                  key={chunk.id}
+                  key={`${chunk.id}_build-out-animation`}
                   renderItem={renderItem}
+                  onAnimationEnd={this.onBuildOutAnimationEnd}
                 />
-              )
-          ))}
+              );
+            }
+            return (
+              <ChunkedRenderListItemsChunk<IT>
+                items={chunk.items}
+                key={chunk.id}
+                renderItem={renderItem}
+              />
+            );
+          })}
         </div>
       </div>
     );

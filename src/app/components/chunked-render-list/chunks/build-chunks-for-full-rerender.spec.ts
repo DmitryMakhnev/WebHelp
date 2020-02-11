@@ -1,7 +1,7 @@
 import { createItems } from './test-tuils/create-items';
 import { buildChunksForFullRerender } from './build-chunks-for-full-rerender';
-import { chunkIdsFactory } from './chunk-id-factory';
-import { getIdsOfItems } from './test-tuils/get-ids-of-items';
+import { createChunkId } from './chunk-id-factory';
+import { getIdsOfItemsAsSet } from './test-tuils/get-ids-of-items-as-set';
 import { getMapKeysAsSet } from '../../../../lib/test-utils/get-map-keys-as-set';
 
 const TEST_CHUNK_SIZE = 10;
@@ -11,7 +11,7 @@ function createDataForTest(from: number, to: number) {
   return {
     items,
     chunksBuildingResult: buildChunksForFullRerender(
-      chunkIdsFactory,
+      createChunkId,
       TEST_CHUNK_SIZE,
       {
         modificationType: 'INITIAL',
@@ -40,7 +40,7 @@ describe('buildChunksForFullRerender', () => {
       expect(
         getMapKeysAsSet(result.chunksBuildingResult.chunksForRender[0].itemIndexesById),
       ).toEqual(
-        getIdsOfItems(result.items.slice(0, 10)),
+        getIdsOfItemsAsSet(result.items.slice(0, 10)),
       );
     });
   });
@@ -60,7 +60,7 @@ describe('buildChunksForFullRerender', () => {
       expect(
         getMapKeysAsSet(result.chunksBuildingResult.chunks[1].itemIndexesById),
       ).toEqual(
-        getIdsOfItems(result.items.slice(10, 12)),
+        getIdsOfItemsAsSet(result.items.slice(10, 12)),
       );
     });
   });
@@ -80,7 +80,7 @@ describe('buildChunksForFullRerender', () => {
       expect(
         getMapKeysAsSet(result.chunksBuildingResult.chunks[0].itemIndexesById),
       ).toEqual(
-        getIdsOfItems(result.items.slice(0, 8)),
+        getIdsOfItemsAsSet(result.items.slice(0, 8)),
       );
     });
   });

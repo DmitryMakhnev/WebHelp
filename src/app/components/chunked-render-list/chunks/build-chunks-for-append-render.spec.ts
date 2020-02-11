@@ -1,48 +1,29 @@
 import { buildChunksForAppendRender } from './build-chunks-for-append-render';
-import { buildChunksForFullRerender } from './build-chunks-for-full-rerender';
-import { chunkIdsFactory } from './chunk-id-factory';
+import { createChunkId } from './chunk-id-factory';
 import { createItems } from './test-tuils/create-items';
 import { ChunkedRenderListItem } from '../chunked-render-list-item';
-import { ChunkedRenderListItemsChunksBuildResult } from './chunked-render-list-items-chunks-build-result';
 import { getMapKesAsArray } from '../../../../lib/test-utils/get-map-keys-as-array';
 import { ChunkedRenderListItemsChunkModel } from './chunked-render-list-items-chunk-model';
+import { DEFAULT_CHUNK_SIZE_FOR_TESTS } from './test-tuils/build-chunks-test-consts';
+import { CreatedInitialChunksDataResult, createInitialChunksData } from './test-tuils/create-initial-chunks-data';
+import { getIdsOfItemsAsArray } from './test-tuils/get-ids-of-items-as-array';
 
-const CHUNK_SIZE_FOR_TESTS = 10;
 const APPENDED_PREFIX = 'appended_';
 
-interface CreatedInitialResult {
-  items: ChunkedRenderListItem[];
-  initialChunks: ChunkedRenderListItemsChunksBuildResult<ChunkedRenderListItem>;
-}
-
-function createInitialData(
-  from: number,
-  to: number,
-  chunkSize = CHUNK_SIZE_FOR_TESTS,
-): CreatedInitialResult {
-  const items = createItems(from, to);
-  return {
-    items,
-    initialChunks: buildChunksForFullRerender(
-      chunkIdsFactory,
-      chunkSize,
-      {
-        modificationType: 'INITIAL',
-        children: items,
-        modifyingChildren: items,
-        bearingItemId: null,
-      },
-    ),
-  };
-}
+// TODO [dmitry.makhnev]: rendered chunk problems after multi rerender:
+// case open first level,
+// open second level,
+// close first level,
+// open first level,
+// open second level,
 
 function createAppendedData(
   from: number,
   to: number,
   prefix: string,
   afterItemId: string,
-  createdInitialResult: CreatedInitialResult,
-  chunkSize = CHUNK_SIZE_FOR_TESTS,
+  createdInitialResult: CreatedInitialChunksDataResult,
+  chunkSize = DEFAULT_CHUNK_SIZE_FOR_TESTS,
 ) {
   const appendedItems = createItems(from, to, prefix);
   const prevItems = createdInitialResult.items;
@@ -56,7 +37,7 @@ function createAppendedData(
     allItems,
     appendedItems,
     resultChunks: buildChunksForAppendRender(
-      chunkIdsFactory,
+      createChunkId,
       chunkSize,
       createdInitialResult.initialChunks.chunksForRender,
       createdInitialResult.initialChunks.chunks,
@@ -72,7 +53,12 @@ function createAppendedData(
 }
 
 function appendInOneRenderedChunkItemsCountWhichIsLessThanChunkCount() {
-  const createdInitialResult = createInitialData(1, 2);
+  const createdInitialResult = createInitialChunksData(
+    {
+      from: 1,
+      to: 2,
+    },
+  );
   const firstItem = createdInitialResult.items[0];
   return createAppendedData(
     1,
@@ -84,7 +70,13 @@ function appendInOneRenderedChunkItemsCountWhichIsLessThanChunkCount() {
 }
 
 function appendInOneRenderedChunkItemsCountWhichIsMoreThanChunkCount() {
-  const createdInitialResult = createInitialData(1, 2, 2);
+  const createdInitialResult = createInitialChunksData(
+    {
+      from: 1,
+      to: 2,
+    },
+    2,
+  );
   const firstItem = createdInitialResult.items[0];
   return createAppendedData(
     1,
@@ -97,7 +89,13 @@ function appendInOneRenderedChunkItemsCountWhichIsMoreThanChunkCount() {
 }
 
 function appendInNotFirstButLastRenderedChunkItemsCountWhichIsNotMoreThanChunkCount() {
-  const createdInitialResult = createInitialData(1, 6, 2);
+  const createdInitialResult = createInitialChunksData(
+    {
+      from: 1,
+      to: 6,
+    },
+    2,
+  );
 
   // render all chunks
   const initialChunks = createdInitialResult.initialChunks;
@@ -115,7 +113,13 @@ function appendInNotFirstButLastRenderedChunkItemsCountWhichIsNotMoreThanChunkCo
 }
 
 function appendInNotFirstAndNotLastRenderedChunkItemsCountWhichIsNotMoreThanChunkCount() {
-  const createdInitialResult = createInitialData(1, 6, 2);
+  const createdInitialResult = createInitialChunksData(
+    {
+      from: 1,
+      to: 6,
+    },
+    2,
+  );
 
   // render all chunks
   const initialChunks = createdInitialResult.initialChunks;
@@ -133,7 +137,13 @@ function appendInNotFirstAndNotLastRenderedChunkItemsCountWhichIsNotMoreThanChun
 }
 
 function appendInNotFirstAndNotLastRenderedChunkItemsCountWhichIsMoreThanChunkCount() {
-  const createdInitialResult = createInitialData(1, 6, 2);
+  const createdInitialResult = createInitialChunksData(
+    {
+      from: 1,
+      to: 6,
+    },
+    2,
+  );
 
   // render all chunks
   const initialChunks = createdInitialResult.initialChunks;
@@ -153,7 +163,10 @@ function appendInNotFirstAndNotLastRenderedChunkItemsCountWhichIsMoreThanChunkCo
 describe('buildChunksForAppendRender', () => {
   describe('correct data in fixtures', () => {
     it('result items are correct', () => {
-      const createdInitialResult = createInitialData(1, 2);
+      const createdInitialResult = createInitialChunksData({
+        from: 1,
+        to: 2,
+      });
       const firstItem = createdInitialResult.items[0];
       const appendedData = createAppendedData(
         1,
@@ -162,12 +175,15 @@ describe('buildChunksForAppendRender', () => {
         firstItem.id,
         createdInitialResult,
       );
-      const resultAllIds = appendedData.allItems.map(item => item.id);
+      const resultAllIds = getIdsOfItemsAsArray(appendedData.allItems);
       expect(resultAllIds).toEqual(['1', `${APPENDED_PREFIX}1`, `${APPENDED_PREFIX}2`, '2']);
       expect(resultAllIds).toEqual(['1', `${APPENDED_PREFIX}1`, `${APPENDED_PREFIX}2`, '2']);
     });
     it('appended items are correct', () => {
-      const createdInitialResult = createInitialData(1, 2);
+      const createdInitialResult = createInitialChunksData({
+        from: 1,
+        to: 2,
+      });
       const firstItem = createdInitialResult.items[0];
       const appendedData = createAppendedData(
         1,
@@ -176,7 +192,7 @@ describe('buildChunksForAppendRender', () => {
         firstItem.id,
         createdInitialResult,
       );
-      const appendItemIds = appendedData.appendedItems.map(item => item.id);
+      const appendItemIds = getIdsOfItemsAsArray(appendedData.appendedItems);
       expect(appendItemIds).toEqual([`${APPENDED_PREFIX}1`, `${APPENDED_PREFIX}2`]);
     });
   });
