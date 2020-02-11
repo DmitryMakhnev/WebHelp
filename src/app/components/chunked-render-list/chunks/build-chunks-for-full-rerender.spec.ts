@@ -84,4 +84,14 @@ describe('buildChunksForFullRerender', () => {
       );
     });
   });
+  describe('no items', () => {
+    it('chunks are empty', () => {
+      const result = createDataForTest(0, -1);
+      expect(result.chunksBuildingResult.chunks).toEqual([]);
+    });
+    it('chunks for render are empty', () => {
+      const result = createDataForTest(0, -1);
+      expect(result.chunksBuildingResult.chunksForRender).toEqual([]);
+    });
+  });
 });

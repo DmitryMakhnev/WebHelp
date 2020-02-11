@@ -35,6 +35,6 @@ export function buildChunksForFullRerender<
   }
   return {
     chunks,
-    chunksForRender: [chunks[0]],
+    chunksForRender: chunks.length !== 0 ? [chunks[0]] : [],
   };
 }

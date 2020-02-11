@@ -43,7 +43,7 @@ export class ChunkedRenderList<
 
   private allAppendChunks: ChunkedRenderListItemsChunkModel<IT>[]|undefined;
 
-  private isDuringInBuildAnimation = false;
+  private isDuringAppendingAnimation = false;
 
   private scrollContainer: HTMLDivElement|undefined;
 
@@ -54,6 +54,10 @@ export class ChunkedRenderList<
   private resolvedChunkSize: number;
 
   private resolvedGapBeforeScrollEndChecking: number;
+
+  private allRequiredChunksWasRendered = true;
+
+  private nextRepresentationForRender: MT|undefined;
 
   constructor(props: ChunkedRenderListProps<IT, MT>) {
     super(props);
@@ -71,10 +75,13 @@ export class ChunkedRenderList<
     reaction(
       () => childrenRepresentationHolder.childrenModification,
       childrenRepresentation => {
-        this.cancelScheduledRenderingTrying();
         this.stopAllAnimation();
-        // TODO [dmitry.makhnev]: remember about building in holes
-        this.rebuildChunks(childrenRepresentation);
+        // if all required chunks weren't rendered we save next update
+        if (!this.allRequiredChunksWasRendered) {
+          this.nextRepresentationForRender = childrenRepresentation;
+        } else {
+          this.rebuildChunks(childrenRepresentation);
+        }
       },
     );
     this.rebuildChunks(childrenRepresentationHolder.childrenModification);
@@ -101,7 +108,7 @@ export class ChunkedRenderList<
           this.allAppendChunks = chunksBuildingResult.allInteractionChunks;
         }
         // start animation
-        this.isDuringInBuildAnimation = true;
+        this.isDuringAppendingAnimation = true;
         break;
       // base case is full rerender
       default:
@@ -113,6 +120,7 @@ export class ChunkedRenderList<
         break;
     }
 
+    this.allRequiredChunksWasRendered = false;
     this.storedChunks = chunksBuildingResult.chunks;
 
     this.renderChunks(chunksBuildingResult.chunksForRender);
@@ -123,14 +131,14 @@ export class ChunkedRenderList<
       {
         chunks,
       },
-      this.isDuringInBuildAnimation
+      this.isDuringAppendingAnimation
         ? noop
         : this.scheduleRequiredNotBuiltChunksChecking,
     );
   }
 
   // main idea if this method is checking of not rendered chunks for without scroll situation
-  // or for holes situations (think about it holes)
+  // or for holes situations after append
   private tryRenderIfItNeed = () => {
     let nextChunksForRender: ChunkedRenderListItemsChunkModel<IT>[]|undefined;
 
@@ -163,6 +171,13 @@ export class ChunkedRenderList<
 
     if (nextChunksForRender) {
       this.renderChunks(nextChunksForRender);
+    } else {
+      this.allRequiredChunksWasRendered = true;
+      const nextRepresentationForRender = this.nextRepresentationForRender;
+      if (nextRepresentationForRender) {
+        this.nextRepresentationForRender = undefined;
+        this.rebuildChunks(nextRepresentationForRender);
+      }
     }
   };
 
@@ -178,20 +193,14 @@ export class ChunkedRenderList<
 
   private stopAllAnimation() {
     // stop animations fro rebuild
-    if (this.isDuringInBuildAnimation) {
-      this.isDuringInBuildAnimation = false;
-      this.buildInChunk = undefined;
+    if (this.isDuringAppendingAnimation) {
+      this.cleanAppendChunksAnimation();
     }
+  }
 
-    // TODO [dmitry.makhnev]: think about it
-    // it's possible to have holes if next append
-    // is run before last append chunks was added completely
-    // possible solutions?
-    // 1) block opening until drawing all appended chunks (extra painfully)
-    // 2) try to understand it in building appending/removing (painfully)
-    if (this.allAppendChunks) {
-      this.allAppendChunks = undefined;
-    }
+  private cleanAppendChunksAnimation() {
+    this.isDuringAppendingAnimation = false;
+    this.buildInChunk = undefined;
   }
 
   private getChunksForNextRender(): ChunkedRenderListItemsChunkModel<IT>[]|undefined {
@@ -204,8 +213,7 @@ export class ChunkedRenderList<
   }
 
   private onBuildAnimationEnd = () => {
-    this.buildInChunk = undefined;
-    this.isDuringInBuildAnimation = false;
+    this.cleanAppendChunksAnimation();
 
     // run force rerender for updating chunks after animation
     this.forceUpdate(this.scheduleRequiredNotBuiltChunksChecking);
@@ -231,8 +239,10 @@ export class ChunkedRenderList<
     if (this.scrollContainer) {
       this.scrollContainer.removeEventListener('scroll', this.scrollListener);
     }
-    this.scrollContainer = scrollContainer;
-    scrollContainer.addEventListener('scroll', this.scrollListener);
+    if (scrollContainer) {
+      this.scrollContainer = scrollContainer;
+      scrollContainer.addEventListener('scroll', this.scrollListener);
+    }
   };
 
   private setInnerContainer = (innerContainer: HTMLDivElement) => {
@@ -242,6 +252,7 @@ export class ChunkedRenderList<
   render() {
     const props = this.props;
     const renderItem = props.renderItem;
+
     return (
       <div className={classNames(styles.root, props.className)} ref={this.setScrollContainer}>
         <div className={styles.inner} ref={this.setInnerContainer}>
