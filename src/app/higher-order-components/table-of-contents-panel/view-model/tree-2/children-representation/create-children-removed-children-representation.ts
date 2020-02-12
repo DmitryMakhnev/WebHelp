@@ -51,6 +51,8 @@ export function createChildrenRemovedChildrenRepresentation(
     );
   }
 
+  removingChildren.forEach(removingChild => removingChild.setIsSubPagesShowed(false));
+
   return {
     modificationType: 'CHILDREN_REMOVED',
     children: newChildren,
