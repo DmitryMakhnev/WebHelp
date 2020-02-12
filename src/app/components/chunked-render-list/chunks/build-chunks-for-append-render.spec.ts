@@ -10,13 +10,6 @@ import { getIdsOfItemsAsArray } from './test-tuils/get-ids-of-items-as-array';
 
 const APPENDED_PREFIX = 'appended_';
 
-// TODO [dmitry.makhnev]: rendered chunk problems after multi rerender:
-// case open first level,
-// open second level,
-// close first level,
-// open first level,
-// open second level,
-
 function createAppendedData(
   from: number,
   to: number,
