@@ -2,7 +2,7 @@ export type ChunkedRenderListItemsModificationType =
   | 'INITIAL'
   | 'CHILDREN_APPENDED'
   | 'CHILDREN_REMOVED'
-  | 'SELF_SELECTED'
-  | 'OUTSIDE_SELECTED'
+  | 'INTERACTION_WITH'
+  | 'ADDING_INDEPENDENT_PART'
   | 'FILTERED'
   | 'RESTORED';

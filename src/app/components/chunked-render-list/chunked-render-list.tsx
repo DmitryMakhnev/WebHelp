@@ -16,7 +16,7 @@ import { buildChunksForRemovedRerender } from './chunks/build-chunks-for-removed
 import { ChunkedListBuildOutAnimatedSubPart } from './animations/build-out-animated-sub-part/chunked-list-build-out-animated-sub-part';
 
 const DEFAULT_GAP_BEFORE_SCROLL_END_CHECKING = 100;
-const DEFAULT_LIST_ITEMS_CHUNK_SIZE = 50;
+const DEFAULT_LIST_ITEMS_CHUNK_SIZE = 10;
 
 function noop() {}
 
@@ -65,9 +65,9 @@ export class ChunkedRenderList<
 > extends Component<ChunkedRenderListProps<IT, MT>, ChunkedRenderListState<IT>> {
   private storedChunks: ChunkedRenderListItemsChunkModel<IT>[] = [];
 
-  private buildInChunk: ChunkedRenderListItemsChunkModel<IT>|undefined;
-
   private allAppendChunks: ChunkedRenderListItemsChunkModel<IT>[]|undefined;
+
+  private buildInChunk: ChunkedRenderListItemsChunkModel<IT>|undefined;
 
   private isDuringAppendingAnimation = false;
 

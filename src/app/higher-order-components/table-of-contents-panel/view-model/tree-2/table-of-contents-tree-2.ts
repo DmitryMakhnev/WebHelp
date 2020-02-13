@@ -15,6 +15,8 @@ import { createChildrenAppendedChildrenRepresentation } from './children-represe
 import { createChildrenRemovedChildrenRepresentation } from './children-representation/create-children-removed-children-representation';
 import { restoreTableOfContentsViewRepresentationChildren } from './utils/restore-table-of-contents-view-representation-children';
 import { ChunkedRenderListModificationHolder } from '../../../../components/chunked-render-list/chunked-render-list-modification-holder';
+import { createAddingIndependentPartChildrenRepresentation } from './children-representation/create-adding-independent-part-children-representation';
+import { getPathToPageRepresentationFromRoot } from './utils/get-path-to-page-representation-from-root';
 
 export class TableOfContentsTree2
 implements
@@ -76,6 +78,31 @@ implements
     } else {
       this.showSubPages(pageViewRepresentation);
     }
+  }
+
+  @action.bound
+  selectPageFromOutside(
+    pageId: TableOfContentsPageId,
+    isRequiredToShowChildren: boolean = false,
+  ): boolean {
+    const pathToPageFromRoot = getPathToPageRepresentationFromRoot(
+      this.pageViewRepresentationsById,
+      pageId,
+    );
+    const isWasSelected = pathToPageFromRoot != null;
+
+    if (isWasSelected) {
+      // TODO [dmitry.makhnev]:  add state for selected
+      this.childrenModification = createAddingIndependentPartChildrenRepresentation(
+        this.childrenModification,
+        this.pageViewRepresentationsById.get(pageId) as TableOfContentsPageViewRepresentation,
+        this.pageViewRepresentationsById,
+        pathToPageFromRoot as TableOfContentsPageId[],
+        isRequiredToShowChildren,
+      );
+    }
+
+    return isWasSelected;
   }
 
   @action.bound

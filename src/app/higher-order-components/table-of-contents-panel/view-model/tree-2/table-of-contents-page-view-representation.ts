@@ -1,7 +1,7 @@
 import { ChunkedRenderListItem } from '../../../../components/chunked-render-list/chunked-render-list-item';
 
 export class TableOfContentsPageViewRepresentation implements ChunkedRenderListItem {
-  constructor(public page: TableOfContentsPage, public sortedIndex: number) {
+  constructor(public page: TableOfContentsPage) {
     const children = new Set<TableOfContentsPageId>();
 
     this.id = page.id;

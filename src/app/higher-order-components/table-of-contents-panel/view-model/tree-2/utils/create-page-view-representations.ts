@@ -3,5 +3,5 @@ import { TableOfContentsPageViewRepresentation } from '../table-of-contents-page
 export function createPageViewRepresentations(
   sortedPages: TableOfContentsPage[],
 ): TableOfContentsPageViewRepresentation[] {
-  return sortedPages.map((page, index) => new TableOfContentsPageViewRepresentation(page, index));
+  return sortedPages.map(page => new TableOfContentsPageViewRepresentation(page));
 }

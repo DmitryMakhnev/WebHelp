@@ -178,6 +178,7 @@ export function buildChunksForRemovedRerender<
       notRenderedChunksAfterRenderedChunks = [];
   }
 
+  // build result chunks
   const allChunksForRender =
     renderedChunksBeforeChunkWithItemBeforeRemoving.concat(
       resultChunkWithItemBeforeRemoving,
