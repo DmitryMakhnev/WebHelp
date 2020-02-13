@@ -19,7 +19,6 @@ export interface TableOfContentsPanelProps {
 
 export const TableOfContentsPanel: FC<TableOfContentsPanelProps> = observer(props => {
   const viewModel = props.viewModel;
-  const tree = viewModel.tree;
   const tree2 = viewModel.tree2;
 
   return (
@@ -29,9 +28,6 @@ export const TableOfContentsPanel: FC<TableOfContentsPanelProps> = observer(prop
         {jsxIf(tree2 != null, () => (
           <>
             <TableOfContentsFilter tree={tree2 as TableOfContentsTree2} />
-            {tree.currentAnchors.list.map(anchor => (
-              <div key={anchor.id}>{anchor.title}</div>
-            ))}
             <hr />
           </>
         ))}
@@ -46,9 +42,10 @@ export const TableOfContentsPanel: FC<TableOfContentsPanelProps> = observer(prop
           childrenRepresentationHolder={tree2 as TableOfContentsTree2}
           renderItem={representation => (
             <TableOfContentsListItem
+              key={representation.id}
               pageViewRepresentation={representation}
               toggleSubPages={() => (tree2 as TableOfContentsTree2).toggleSubPages(representation)}
-              key={representation.id}
+              selectPage={() => (tree2 as TableOfContentsTree2).selectPage(representation.id)}
             />
           )}
           itemIdAttribute={ITEM_ID_ATTRIBUTE}

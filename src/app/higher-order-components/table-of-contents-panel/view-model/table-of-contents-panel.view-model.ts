@@ -1,6 +1,5 @@
 import { computed, runInAction } from 'mobx';
 import { TableOfContentsModel } from '../../../data-layer/table-of-contents/table-of-contents.model';
-import { createTableOfContentsTree, TableOfContentsTree } from './tree/table-of-contents-tree';
 import {
   createTableOfContentsTree2,
   TableOfContentsTree2,
@@ -8,12 +7,6 @@ import {
 
 export class TableOfContentsPanelViewModel {
   constructor(private tableOfContentsModel: TableOfContentsModel) {}
-
-  @computed
-  get tree(): TableOfContentsTree {
-    const rawTableOfContents = this.tableOfContentsModel.data;
-    return createTableOfContentsTree(rawTableOfContents);
-  }
 
   @computed
   get tree2(): TableOfContentsTree2 | null {

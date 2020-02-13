@@ -1,4 +1,5 @@
 import React, { FC } from 'react';
+import { observer } from 'mobx-react';
 import styles from './table-of-contents-item.scss';
 import { TableOfContentsPageViewRepresentation } from '../../../higher-order-components/table-of-contents-panel/view-model/tree-2/table-of-contents-page-view-representation';
 
@@ -8,16 +9,15 @@ export const ITEM_ID_ATTRIBUTE = 'data-item-id';
 interface SimpleNodeProps {
   pageViewRepresentation: TableOfContentsPageViewRepresentation;
   toggleSubPages: () => void;
+  selectPage: () => void;
 }
 
-const noop = () => {};
-
-export const TableOfContentsListItem: FC<SimpleNodeProps> = props => {
+export const TableOfContentsListItem: FC<SimpleNodeProps> = observer(props => {
   const pageViewRepresentation = props.pageViewRepresentation;
   const page = pageViewRepresentation.page;
   return (
     <div className={styles.item} data-level={page.level} data-item-id={pageViewRepresentation.id}>
-      <button type="button" onClick={noop}>
+      <button type="button" onClick={props.selectPage}>
         {page.title}
       </button>
       {pageViewRepresentation.hasChildren ? (
@@ -27,4 +27,4 @@ export const TableOfContentsListItem: FC<SimpleNodeProps> = props => {
       ) : null}
     </div>
   );
-};
+});

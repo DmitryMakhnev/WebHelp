@@ -20,7 +20,7 @@ const DEFAULT_GAP_BEFORE_SCROLL_END_CHECKING = 100;
 const DEFAULT_SPACE_BEFORE_SCROLL_CHECKING_GAP = 50;
 const DEFAULT_ITEM_ID_ATTRIBUTE = 'data-item-id';
 const DEFAULT_GAP_FOR_INTERACTION_ITEM = 50;
-const DEFAULT_LIST_ITEMS_CHUNK_SIZE = 20;
+const DEFAULT_LIST_ITEMS_CHUNK_SIZE = 50;
 
 function noop() {}
 
@@ -421,7 +421,6 @@ export class ChunkedRenderList<
   private scrollListener = () => {
     const scrollContainer = this.scrollContainer;
     if (scrollContainer && !this.isDuringAppendingAnimation && !this.isDuringRemovingAnimation) {
-      console.log('SCROLL!!');
       const scrollTop = scrollContainer.scrollTop;
       const isRequiredToCheckChunksBefore = scrollTop <
         (this.gapBeforeScrollEndChecking + this.spaceBeforeScrollCheckingGap);

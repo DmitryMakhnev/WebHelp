@@ -1,3 +1,4 @@
+import { action, observable } from 'mobx';
 import { ChunkedRenderListItem } from '../../../../components/chunked-render-list/chunked-render-list-item';
 
 export class TableOfContentsPageViewRepresentation implements ChunkedRenderListItem {
@@ -35,7 +36,13 @@ export class TableOfContentsPageViewRepresentation implements ChunkedRenderListI
     this.isSubPagesShowed = isSubPagesShowed;
   }
 
+  @observable.ref
   isSelected = false;
+
+  @action
+  setIsSelected(isSelected: boolean) {
+    this.isSelected = isSelected;
+  }
 
   isParentOfSelected = false;
 }

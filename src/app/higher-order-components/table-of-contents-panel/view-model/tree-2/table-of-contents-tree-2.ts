@@ -51,6 +51,8 @@ implements
 
   private isInSearchMode = false;
 
+  private currentSelectedPage: TableOfContentsPageViewRepresentation|null = null;
+
   @action.bound
   showSubPages(pageViewRepresentation: TableOfContentsPageViewRepresentation) {
     pageViewRepresentation.setIsSubPagesShowed(true);
@@ -81,28 +83,45 @@ implements
   }
 
   @action.bound
+  selectPage(
+    pageId: TableOfContentsPageId,
+  ): boolean {
+    const selectionPageView = this.pageViewRepresentationsById.get(pageId);
+
+    if (selectionPageView) {
+      if (this.currentSelectedPage) {
+        this.currentSelectedPage.setIsSelected(false);
+      }
+      selectionPageView.setIsSelected(true);
+      this.currentSelectedPage = selectionPageView;
+      return true;
+    }
+
+    return false;
+  }
+
+  @action.bound
   selectPageFromOutside(
     pageId: TableOfContentsPageId,
     isRequiredToShowChildren: boolean = false,
   ): boolean {
-    const pathToPageFromRoot = getPathToPageRepresentationFromRoot(
-      this.pageViewRepresentationsById,
-      pageId,
-    );
-    const isWasSelected = pathToPageFromRoot != null;
+    const isPageWasSelect = this.selectPage(pageId);
 
-    if (isWasSelected) {
-      // TODO [dmitry.makhnev]:  add state for selected
+    if (isPageWasSelect) {
+      const pathToSelectedPageFromRoot = getPathToPageRepresentationFromRoot(
+        this.pageViewRepresentationsById,
+        pageId,
+      ) as TableOfContentsPageId[];
       this.childrenModification = createAddingIndependentPartChildrenRepresentation(
         this.childrenModification,
         this.pageViewRepresentationsById.get(pageId) as TableOfContentsPageViewRepresentation,
         this.pageViewRepresentationsById,
-        pathToPageFromRoot as TableOfContentsPageId[],
+        pathToSelectedPageFromRoot,
         isRequiredToShowChildren,
       );
     }
 
-    return isWasSelected;
+    return isPageWasSelect;
   }
 
   @action.bound
