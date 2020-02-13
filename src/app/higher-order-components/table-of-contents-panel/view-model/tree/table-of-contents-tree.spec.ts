@@ -1,5 +1,5 @@
 import HelpTOCJson from '../../../../../../stub-server/public/api/2019.3/HelpTOC.json';
-import { createTableOfContentsTree2 } from './table-of-contents-tree-2';
+import { createTableOfContentsTree } from './table-of-contents-tree';
 import { IncorrectFixtureError } from '../../../../../lib/errors/incorrect-fixture-error';
 import { insertInArrayAfter } from '../../../../../lib/arrays/insert-in-array-after';
 import { getIdsOfItemsAsArray } from '../../../../components/chunked-render-list/chunks/test-tuils/get-ids-of-items-as-array';
@@ -8,13 +8,13 @@ import { TableOfContentsPageViewRepresentation } from './table-of-contents-page-
 const tableOfContentsFixture: TableOfContentsApiResponse = (HelpTOCJson as unknown) as
   TableOfContentsApiResponse;
 
-describe('TableOfContentsTree2', () => {
+describe('TableOfContentsTree', () => {
   // TODO [dmitry.makhnev]: add all tests for all cases
   describe('selectPageFromOutside', () => {
     // TODO [dmitry.makhnev]: check page representations states
     it('select top level page', () => {
       const firstFirsLevelPageId = tableOfContentsFixture.topLevelIds[0];
-      const tree = createTableOfContentsTree2(tableOfContentsFixture);
+      const tree = createTableOfContentsTree(tableOfContentsFixture);
       const childrenBeforeSelection = tree.childrenModification.children;
       tree.selectPageFromOutside(firstFirsLevelPageId);
       const childrenModificationAfterSelection = tree.childrenModification;
@@ -41,7 +41,7 @@ describe('TableOfContentsTree2', () => {
       );
       const firstSecondLevelPageId = firstSecondLevelPage.id;
 
-      const tree = createTableOfContentsTree2(tableOfContentsFixture);
+      const tree = createTableOfContentsTree(tableOfContentsFixture);
       const parentRepresentationOfSelectedPage = tree.childrenModification.children.find(
         representation => representation.id === parentOfSelectedNode.id,
       ) as TableOfContentsPageViewRepresentation;
@@ -73,7 +73,7 @@ describe('TableOfContentsTree2', () => {
       );
       const firstSecondLevelPageId = firstSecondLevelPage.id;
 
-      const tree = createTableOfContentsTree2(tableOfContentsFixture);
+      const tree = createTableOfContentsTree(tableOfContentsFixture);
       tree.selectPageFromOutside(firstSecondLevelPageId);
       const childrenModificationAfterSelection = tree.childrenModification;
       expect(childrenModificationAfterSelection.modificationType).toEqual('ADDING_INDEPENDENT_PART');
@@ -112,7 +112,7 @@ describe('TableOfContentsTree2', () => {
       );
       const firstThirdLevelPageId = firstThirdLevelPage.id;
 
-      const tree = createTableOfContentsTree2(tableOfContentsFixture);
+      const tree = createTableOfContentsTree(tableOfContentsFixture);
       tree.selectPageFromOutside(firstThirdLevelPageId);
       const childrenModificationAfterSelection = tree.childrenModification;
 
@@ -140,7 +140,7 @@ describe('TableOfContentsTree2', () => {
       );
       const modifyingChildrenPageIds = firstLevelPageWithChildren.pages;
 
-      const tree = createTableOfContentsTree2(tableOfContentsFixture);
+      const tree = createTableOfContentsTree(tableOfContentsFixture);
       tree.selectPageFromOutside(firstLevelPageWithChildrenId, true);
 
       const childrenModificationAfterSelection = tree.childrenModification;
@@ -187,7 +187,7 @@ describe('TableOfContentsTree2', () => {
         secondFirstLevelPageWithChildrenId,
       );
 
-      const tree = createTableOfContentsTree2(tableOfContentsFixture);
+      const tree = createTableOfContentsTree(tableOfContentsFixture);
       // prepare showed part
       const parentRepresentationOfSelectedPage = tree.childrenModification.children.find(
         representation => representation.id === firstFirstLevelPageWithChildrenId,
@@ -242,7 +242,7 @@ describe('TableOfContentsTree2', () => {
         firstLevelPageId,
       );
 
-      const tree = createTableOfContentsTree2(tableOfContentsFixture);
+      const tree = createTableOfContentsTree(tableOfContentsFixture);
       tree.selectPageFromOutside(secondLevelPageId, true);
 
       // checking

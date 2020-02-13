@@ -18,7 +18,7 @@ import { ChunkedRenderListModificationHolder } from '../../../../components/chun
 import { createAddingIndependentPartChildrenRepresentation } from './children-representation/create-adding-independent-part-children-representation';
 import { getPathToPageRepresentationFromRoot } from './utils/get-path-to-page-representation-from-root';
 
-export class TableOfContentsTree2
+export class TableOfContentsTree
 implements
   ChunkedRenderListModificationHolder<
     TableOfContentsPageViewRepresentation,
@@ -164,6 +164,6 @@ implements
   }
 }
 
-export function createTableOfContentsTree2(tableOfContents: TableOfContentsApiResponse) {
-  return runInAction(() => new TableOfContentsTree2(tableOfContents));
+export function createTableOfContentsTree(tableOfContents: TableOfContentsApiResponse) {
+  return runInAction(() => new TableOfContentsTree(tableOfContents));
 }

@@ -21,14 +21,14 @@ export const TableOfContentsPanelHoc: FC<TableOfContentsPanelHOCProps> = observe
     console.log('hok run effect');
 
     WEB_HELP_OUTSIDE_API.selectByPageId = pageId => {
-      if (tableOfContentsViewModel.tree2) {
-        return tableOfContentsViewModel.tree2.selectPageFromOutside(pageId, true);
+      if (tableOfContentsViewModel.tree) {
+        return tableOfContentsViewModel.tree.selectPageFromOutside(pageId, true);
       }
       return false;
     };
     WEB_HELP_OUTSIDE_API.filterByText = text => {
-      if (tableOfContentsViewModel.tree2) {
-        tableOfContentsViewModel.tree2.filter(text);
+      if (tableOfContentsViewModel.tree) {
+        tableOfContentsViewModel.tree.filter(text);
       }
     };
 
@@ -40,7 +40,6 @@ export const TableOfContentsPanelHoc: FC<TableOfContentsPanelHOCProps> = observe
   return (
     <TableOfContentsPanel
       className={props.className}
-      dataState={dataLayerConnection.tableOfContentsModel.fetchingDataState.state}
       viewModel={tableOfContentsViewModel}
     />
   );

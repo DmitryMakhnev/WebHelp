@@ -1,17 +1,22 @@
 import { computed, runInAction } from 'mobx';
 import { TableOfContentsModel } from '../../../data-layer/table-of-contents/table-of-contents.model';
 import {
-  createTableOfContentsTree2,
-  TableOfContentsTree2,
-} from './tree-2/table-of-contents-tree-2';
+  createTableOfContentsTree,
+  TableOfContentsTree,
+} from './tree/table-of-contents-tree';
 
 export class TableOfContentsPanelViewModel {
   constructor(private tableOfContentsModel: TableOfContentsModel) {}
 
   @computed
-  get tree2(): TableOfContentsTree2 | null {
+  get treeDataLoadingState() {
+    return this.tableOfContentsModel.fetchingDataState.state;
+  }
+
+  @computed
+  get tree(): TableOfContentsTree | null {
     return this.tableOfContentsModel.data
-      ? createTableOfContentsTree2(this.tableOfContentsModel.data)
+      ? createTableOfContentsTree(this.tableOfContentsModel.data)
       : null;
   }
 }

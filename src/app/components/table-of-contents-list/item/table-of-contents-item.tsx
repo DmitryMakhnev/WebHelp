@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { observer } from 'mobx-react';
 import styles from './table-of-contents-item.scss';
-import { TableOfContentsPageViewRepresentation } from '../../../higher-order-components/table-of-contents-panel/view-model/tree-2/table-of-contents-page-view-representation';
+import { TableOfContentsPageViewRepresentation } from '../../../higher-order-components/table-of-contents-panel/view-model/tree/table-of-contents-page-view-representation';
 
 // if you would like to change it please sync with attribute in component
 export const ITEM_ID_ATTRIBUTE = 'data-item-id';
