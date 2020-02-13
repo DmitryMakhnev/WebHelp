@@ -15,7 +15,7 @@ export const TableOfContentsFilter: FC<{
       <input
         type="text"
         value={props.tree.textQuery || ''}
-        onChange={e => tree.find(e.target.value)}
+        onChange={e => tree.filter(e.target.value)}
       />
     </div>
   );

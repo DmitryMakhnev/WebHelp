@@ -19,9 +19,18 @@ export const TableOfContentsPanelHoc: FC<TableOfContentsPanelHOCProps> = observe
 
   useEffect(() => {
     console.log('hok run effect');
-    WEB_HELP_OUTSIDE_API.selectByPageId = pageId =>
-      tableOfContentsViewModel.tree.selectByPageId(pageId, true);
-    WEB_HELP_OUTSIDE_API.filterByText = text => tableOfContentsViewModel.tree.filterByText(text);
+
+    WEB_HELP_OUTSIDE_API.selectByPageId = pageId => {
+      if (tableOfContentsViewModel.tree2) {
+        return tableOfContentsViewModel.tree2.selectPageFromOutside(pageId, true);
+      }
+      return false;
+    };
+    WEB_HELP_OUTSIDE_API.filterByText = text => {
+      if (tableOfContentsViewModel.tree2) {
+        tableOfContentsViewModel.tree2.filter(text);
+      }
+    };
 
     dataLayerConnection.tableOfContentsFetchingController.fetch().catch(() => {
       // TODO [dmitry.makhnev]: log

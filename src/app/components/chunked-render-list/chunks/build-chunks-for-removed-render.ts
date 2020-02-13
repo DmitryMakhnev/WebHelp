@@ -101,6 +101,7 @@ export function buildChunksForRemovedRerender<
       );
       // eslint-disable-next-line max-len
       chunkWithItemsAfterRemovingWasFoundIn = chunkWithItemsAfterRemovingWasFoundInChunkWithItemBefore;
+      chunkWithItemsAfterRemovingIndex = indexOfChunkWithItemBeforeRemoving;
     } else {
       // try to find chunk with item after removing in rendered chunks
       const indexOfChunkWithItemAfterRemoving = prevRenderedChunks.findIndex(
@@ -157,6 +158,7 @@ export function buildChunksForRemovedRerender<
   let notRenderedChunksAfterRenderedChunks: ChunkedRenderListItemsChunkModel<IT>[];
 
   switch (chunkWithItemsAfterRemovingWasFoundIn) {
+    case chunkWithItemsAfterRemovingWasFoundInChunkWithItemBefore:
     case chunkWithItemsAfterRemovingWasFoundInChunksForRender:
       renderedChunksAfterRemoving = prevRenderedChunks.slice(
         chunkWithItemsAfterRemovingIndex + 1,

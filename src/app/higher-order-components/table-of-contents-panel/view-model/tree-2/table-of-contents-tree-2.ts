@@ -106,7 +106,7 @@ implements
   }
 
   @action.bound
-  find(textQuery: string) {
+  filter(textQuery: string) {
     if (textQuery === this.textQuery) {
       return;
     }

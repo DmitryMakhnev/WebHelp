@@ -6,7 +6,7 @@ import { ChunkedRenderList } from '../chunked-render-list/chunked-render-list';
 import { TableOfContentsPanelViewModel } from '../../higher-order-components/table-of-contents-panel/view-model/table-of-contents-panel.view-model';
 import { TableOfContentsFilter } from '../table-of-contents-filter/table-of-contents-filter';
 import { jsxIf } from '../../../lib/jsx/jsx-if';
-import { TableOfContentsListItem } from '../table-of-contents-list/item/table-of-contents-item';
+import { ITEM_ID_ATTRIBUTE, TableOfContentsListItem } from '../table-of-contents-list/item/table-of-contents-item';
 import { TableOfContentsPageViewRepresentation } from '../../higher-order-components/table-of-contents-panel/view-model/tree-2/table-of-contents-page-view-representation';
 import { TableOfContentsTree2 } from '../../higher-order-components/table-of-contents-panel/view-model/tree-2/table-of-contents-tree-2';
 import { TableOfContentsChildrenModificationRepresentation } from '../../higher-order-components/table-of-contents-panel/view-model/tree-2/children-representation/table-of-contents-children-modification-representation';
@@ -51,6 +51,7 @@ export const TableOfContentsPanel: FC<TableOfContentsPanelProps> = observer(prop
               key={representation.id}
             />
           )}
+          itemIdAttribute={ITEM_ID_ATTRIBUTE}
         />
       ))}
     </div>
