@@ -2,7 +2,10 @@ import { action, observable } from 'mobx';
 import { ChunkedRenderListItem } from '../../../../components/chunked-render-list/chunked-render-list-item';
 
 export class TableOfContentsPageViewRepresentation implements ChunkedRenderListItem {
-  constructor(public page: TableOfContentsPage) {
+  constructor(
+    public page: TableOfContentsPage,
+    public anchors: TableOfContentsAnchor[]|undefined,
+  ) {
     const children = new Set<TableOfContentsPageId>();
 
     this.id = page.id;
@@ -43,6 +46,4 @@ export class TableOfContentsPageViewRepresentation implements ChunkedRenderListI
   setIsSelected(isSelected: boolean) {
     this.isSelected = isSelected;
   }
-
-  isParentOfSelected = false;
 }

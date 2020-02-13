@@ -40,7 +40,16 @@ const pagesFixture: TableOfContentsPage[] = [
 ];
 
 function createRepresentationsByIds() {
-  const representations = createPageViewRepresentations(pagesFixture);
+  const representations = createPageViewRepresentations(
+    pagesFixture,
+    {
+      entities: {
+        pages: {},
+        anchors: {},
+      },
+      topLevelIds: [],
+    },
+  );
   return createPageViewRepresentationsByIdIndex(representations);
 }
 

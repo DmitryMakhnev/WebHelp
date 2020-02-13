@@ -26,7 +26,10 @@ implements
   > {
   constructor(private readonly tableOfContents: TableOfContentsApiResponse) {
     const sortedPages = sortTableOfContentsInputDataForTree(tableOfContents);
-    this.sortedPageViewRepresentations = createPageViewRepresentations(sortedPages);
+    this.sortedPageViewRepresentations = createPageViewRepresentations(
+      sortedPages,
+      tableOfContents,
+    );
     this.pageViewRepresentationsById = createPageViewRepresentationsByIdIndex(
       this.sortedPageViewRepresentations,
     );
