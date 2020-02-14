@@ -1,0 +1,39 @@
+@import "../../../styles/vars-and-mixins";
+
+$level-step: $grid-module_4x;
+
+.root {
+  //margin-left: $level-step;
+  }
+
+  .anchor {
+    display: block;
+    font-family: $default-font-family;
+    color: $default-font-color;
+    font-size: $default-font-size;
+    text-decoration: none;
+
+    background-color: $selection-color;
+    padding: $grid-module_2x $grid-module_8x;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    will-change: background-color;
+    transition: background-color $default-animation-function $default-little-animation-duration;
+    }
+    .anchor:hover {
+      background-color: $selection-color_hover;
+      }
+    @for $i from 0 to 10 {
+      .anchor[data-page-level="#{$i}"] {
+        padding-left: $grid-module_8x + $level-step * ($i + 2);
+        }
+      }
+    .prepareAnchorAnimation .anchor {
+      transition: background-color $default-animation-function $default-micro-animation-duration;
+      background-color: transparent;
+      }
+    .prepareAnchorAnimation.animate .anchor {
+      background-color: $selection-color;
+      }

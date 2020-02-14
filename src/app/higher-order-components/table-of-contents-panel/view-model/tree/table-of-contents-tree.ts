@@ -58,22 +58,28 @@ implements
 
   @action.bound
   showSubPages(pageViewRepresentation: TableOfContentsPageViewRepresentation) {
-    pageViewRepresentation.setIsSubPagesShowed(true);
-    this.childrenModification = createChildrenAppendedChildrenRepresentation(
-      this.childrenModification,
-      pageViewRepresentation,
-      this.pageViewRepresentationsById,
-    );
+    if (pageViewRepresentation.hasChildren && !pageViewRepresentation.isSubPagesShowed) {
+      pageViewRepresentation.setShouldHaveContentAnimations(true);
+      pageViewRepresentation.setIsSubPagesShowed(true);
+      this.childrenModification = createChildrenAppendedChildrenRepresentation(
+        this.childrenModification,
+        pageViewRepresentation,
+        this.pageViewRepresentationsById,
+      );
+    }
   }
 
   @action.bound
   hideSubPages(pageViewRepresentation: TableOfContentsPageViewRepresentation) {
-    pageViewRepresentation.setIsSubPagesShowed(false);
-    this.childrenModification = createChildrenRemovedChildrenRepresentation(
-      this.childrenModification,
-      pageViewRepresentation,
-      this.pageViewRepresentationsById,
-    );
+    if (pageViewRepresentation.hasChildren && pageViewRepresentation.isSubPagesShowed) {
+      pageViewRepresentation.setShouldHaveContentAnimations(true);
+      pageViewRepresentation.setIsSubPagesShowed(false);
+      this.childrenModification = createChildrenRemovedChildrenRepresentation(
+        this.childrenModification,
+        pageViewRepresentation,
+        this.pageViewRepresentationsById,
+      );
+    }
   }
 
   @action.bound
@@ -88,14 +94,24 @@ implements
   @action.bound
   selectPage(
     pageId: TableOfContentsPageId,
+    shouldHaveSelectionAnimations: boolean = false,
   ): boolean {
     const selectionPageView = this.pageViewRepresentationsById.get(pageId);
 
-    if (selectionPageView) {
-      if (this.currentSelectedPage) {
-        this.currentSelectedPage.setIsSelected(false);
+    const currentSelectedPage = this.currentSelectedPage;
+    if (selectionPageView && currentSelectedPage !== selectionPageView) {
+      if (currentSelectedPage) {
+        currentSelectedPage.setIsSelected(false);
+        if (shouldHaveSelectionAnimations &&
+          this.childrenModification.children.includes(currentSelectedPage)
+        ) {
+          currentSelectedPage.setShouldHaveSelectionAnimations(true);
+        }
       }
       selectionPageView.setIsSelected(true);
+      if (shouldHaveSelectionAnimations) {
+        selectionPageView.setShouldHaveSelectionAnimations(true);
+      }
       this.currentSelectedPage = selectionPageView;
       return true;
     }
@@ -125,6 +141,12 @@ implements
     }
 
     return isPageWasSelect;
+  }
+
+  @action.bound
+  // eslint-disable-next-line class-methods-use-this
+  selectAnchor(anchorId: TableOfContentsAnchorId) {
+    console.log(`anchor with id '${anchorId}' was selected. Please implement supporting of this`);
   }
 
   @action.bound

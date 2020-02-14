@@ -33,8 +33,10 @@ export class TableOfContentsPageViewRepresentation implements ChunkedRenderListI
     this.currentChildren = currentChildren;
   }
 
+  @observable.ref
   isSubPagesShowed: boolean = false;
 
+  @action
   setIsSubPagesShowed(isSubPagesShowed: boolean) {
     this.isSubPagesShowed = isSubPagesShowed;
   }
@@ -45,5 +47,35 @@ export class TableOfContentsPageViewRepresentation implements ChunkedRenderListI
   @action
   setIsSelected(isSelected: boolean) {
     this.isSelected = isSelected;
+  }
+
+  private storedShouldHaveContentAnimations: boolean = false;
+
+  setShouldHaveContentAnimations(shouldHaveAnimation: boolean) {
+    this.storedShouldHaveContentAnimations = shouldHaveAnimation;
+  }
+
+  get shouldHaveContentAnimations() {
+    if (this.storedShouldHaveContentAnimations) {
+      // we automate reset this flag for once animation
+      this.storedShouldHaveContentAnimations = false;
+      return true;
+    }
+    return false;
+  }
+
+  private storedShouldHaveSelectionAnimations: boolean = false;
+
+  setShouldHaveSelectionAnimations(shouldHaveAnimation: boolean) {
+    this.storedShouldHaveSelectionAnimations = shouldHaveAnimation;
+  }
+
+  get shouldHaveSelectionAnimations() {
+    if (this.storedShouldHaveSelectionAnimations) {
+      // we automate reset this flag for once animation
+      this.storedShouldHaveSelectionAnimations = false;
+      return true;
+    }
+    return false;
   }
 }

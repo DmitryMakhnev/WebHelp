@@ -1,0 +1,18 @@
+@import "../../styles/vars-and-mixins";
+
+.root {
+  position: relative;
+  display: inline-block;
+  }
+
+  .target {
+    @include absoluteFill();
+    @include resetInput();
+    opacity: 0.01;
+    z-index: 1;
+    cursor: pointer;
+    }
+
+  .content {
+
+    }

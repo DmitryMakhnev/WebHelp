@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { configure } from 'mobx';
-import { App } from './components/app/app';
 import './styles/reset.scss';
+import { App } from './components/app/app';
 
 configure({
   enforceActions: 'always',

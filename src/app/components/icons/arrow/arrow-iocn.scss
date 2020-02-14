@@ -1,0 +1,19 @@
+@import "../../../styles/vars-and-mixins";
+
+$arrow-size: 10px;
+$arrow-default-color: $default-micro-icon-color;
+
+.root {
+  display: inline-block;
+  }
+
+  .root:before {
+    content: '';
+    width: 0;
+    height: 0;
+    display: block;
+    border-top: ($arrow-size / 2) solid transparent;
+    border-bottom: ($arrow-size / 2) solid transparent;
+
+    border-left: ($arrow-size / 2) solid $arrow-default-color;
+    }

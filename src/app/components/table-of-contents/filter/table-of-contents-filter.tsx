@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import classNames from 'classnames';
 import { observer } from 'mobx-react';
 import styles from './table-of-contents-filter.scss';
-import { TableOfContentsTree } from '../../higher-order-components/table-of-contents-panel/view-model/tree/table-of-contents-tree';
+import { TableOfContentsTree } from '../../../higher-order-components/table-of-contents-panel/view-model/tree/table-of-contents-tree';
 
 export const TableOfContentsFilter: FC<{
   className?: string;

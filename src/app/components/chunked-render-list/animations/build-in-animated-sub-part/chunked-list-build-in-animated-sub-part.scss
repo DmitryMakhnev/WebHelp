@@ -1,8 +1,11 @@
+@import "../../../../styles/vars-and-mixins";
+
 
 .root {
   height: 0;
   overflow: hidden;
-  transition: height ease-in-out 150ms;
+  transition: height $default-animation-function $default-micro-animation-duration;
+  will-change: height;
   }
 
   .inner {

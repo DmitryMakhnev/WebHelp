@@ -1,0 +1,104 @@
+@import "../../../styles/vars-and-mixins";
+
+$level-step: $grid-module_4x;
+$item-horizontal-padding: $grid-module_8x;
+
+.root {
+
+  }
+
+  .main {
+    position: relative;
+    }
+
+    .mainLink {
+      font-family: $default-font-family;
+      color: $default-font-color;
+      font-size: $default-font-size;
+      text-decoration: none;
+
+      padding: $grid-module_2x $item-horizontal-padding;
+      display: block;
+
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      will-change: background-color;
+      transition: background-color $default-animation-function $default-little-animation-duration;
+      }
+      .mainLink:hover {
+        background-color: $selection-color;
+        }
+      @for $i from 0 to 10 {
+        .root[data-page-level="#{$i}"] .mainLink {
+          padding-left: $item-horizontal-padding + $level-step * ($i + 1);
+          }
+        }
+      .selectedItem .mainLink {
+        background-color: $selection-color;
+        font-weight: bold;
+        }
+      .selectedItem .mainLink:hover {
+        background-color: $selection-color-hover;
+        }
+      .prepareToSelectionAnimation .mainLink {
+        transition: background-color $default-animation-function $default-micro-animation-duration;
+        }
+      .prepareToSelectionAnimation .mainLink {
+        background-color: $selection-color;
+        }
+      .prepareToSelectionAnimation.animate .mainLink {
+        background-color: transparent;
+        }
+      // we dont set start color for self interaction not form transparent
+      // because at this time it based on click after hover
+      .selectedItem.prepareToSelectionAnimation.animate .mainLink {
+        background-color: $selection-color;
+        }
+      .selectedItem.prepareToSelectionAnimation .mainLink:hover {
+        background-color: $selection-color;
+        }
+      .selectedItem.prepareToSelectionAnimation.animate .mainLink:hover {
+        background-color: $selection-color-hover;
+        }
+
+    .toggleAction {
+      position: absolute;
+      width: $grid-module_4x;
+      height: $grid-module_4x;
+      top: $grid-module_2x + 1px; // with little fix for my eye
+      left: $item-horizontal-padding - $grid-module;
+      }
+      @for $i from 1 to 10 {
+        .root[data-page-level="#{$i}"] .toggleAction {
+          left: $item-horizontal-padding + $level-step * $i - $grid-module;
+          }
+        }
+
+      .arrowIcon {
+        position: absolute;
+        left: $grid-module;
+        top: 50%;
+        transform: translateY(-50%) rotate(0deg);
+        will-change: transform;
+        }
+        .arrowIcon.subPagesShowed {
+          transform: translateY(-50%) rotate(90deg);
+          }
+        // we invert arrow for states for correct animations
+        // and run them
+        .prepareToContentAnimation .arrowIcon {
+          transition: transform $default-animation-function $default-micro-animation-duration;
+          }
+        .prepareToContentAnimation .arrowIcon {
+          transform: translateY(-50%) rotate(90deg);
+          }
+        .prepareToContentAnimation.animate .arrowIcon {
+          transform: translateY(-50%) rotate(0deg);
+          }
+        .prepareToContentAnimation .arrowIcon.subPagesShowed {
+          transform: translateY(-50%) rotate(0deg);
+          }
+        .prepareToContentAnimation.animate .arrowIcon.subPagesShowed {
+          transform: translateY(-50%) rotate(90deg);
+          }

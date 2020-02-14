@@ -1,6 +1,6 @@
 import React, { Component, ReactElement } from 'react';
 import classNames from 'classnames';
-import { reaction } from 'mobx';
+import { IReactionDisposer, reaction } from 'mobx';
 import styles from './chunked-render-list.scss';
 import { ChunkedRenderListItem } from './chunked-render-list-item';
 import { ChunkedRenderListItemsChunkModel } from './chunks/chunked-render-list-items-chunk-model';
@@ -104,6 +104,8 @@ export class ChunkedRenderList<
 
   private nextRepresentationForRender: MT|undefined;
 
+  private reactionDisposer: IReactionDisposer|undefined;
+
   constructor(props: ChunkedRenderListProps<IT, MT>) {
     super(props);
 
@@ -124,7 +126,7 @@ export class ChunkedRenderList<
   componentDidMount(): void {
     const childrenRepresentationHolder = this.props.childrenRepresentationHolder;
     // TODO [dmitry.makhnev]: think about doing it without MobX
-    reaction(
+    this.reactionDisposer = reaction(
       () => childrenRepresentationHolder.childrenModification,
       childrenRepresentation => {
         this.stopAllAnimation();
@@ -137,6 +139,12 @@ export class ChunkedRenderList<
       },
     );
     this.rebuildChunks(childrenRepresentationHolder.childrenModification);
+  }
+
+  componentWillUnmount(): void {
+    if (this.reactionDisposer) {
+      this.reactionDisposer();
+    }
   }
 
   private rebuildChunks(childrenRepresentation: MT) {
