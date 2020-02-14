@@ -1,4 +1,4 @@
-import { action, observable, runInAction } from 'mobx';
+import { action, computed, observable, runInAction } from 'mobx';
 import { sortTableOfContentsInputDataForTree } from './utils/sort-table-of-contents-input-data-for-tree';
 import { TableOfContentsChildrenModificationRepresentation } from './children-representation/table-of-contents-children-modification-representation';
 import { createInitialChildrenRepresentation } from './children-representation/create-initial-children-representation';
@@ -17,6 +17,7 @@ import { restoreTableOfContentsViewRepresentationChildren } from './utils/restor
 import { ChunkedRenderListModificationHolder } from '../../../../components/chunked-render-list/chunked-render-list-modification-holder';
 import { createAddingIndependentPartChildrenRepresentation } from './children-representation/create-adding-independent-part-children-representation';
 import { getPathToPageRepresentationFromRoot } from './utils/get-path-to-page-representation-from-root';
+import { Debouncer } from '../../../../../lib/debounce/debouncer';
 
 export class TableOfContentsTree
 implements
@@ -49,8 +50,16 @@ implements
   @observable.ref
   childrenModification: TableOfContentsChildrenModificationRepresentation;
 
+  @computed
+  get hasChildrenForDisplaying() {
+    return this.childrenModification.children.length !== 0;
+  }
+
   @observable.ref
   textQuery: string = '';
+
+  @observable.ref
+  displayingTextQuery: string = '';
 
   private isInSearchMode = false;
 
@@ -186,6 +195,29 @@ implements
     }
 
     this.textQuery = textQuery;
+  }
+
+  @observable.ref
+  isWaitingFilters: boolean = false;
+
+  private filtrationDebouncer = new Debouncer(
+    (textQuery: string) => {
+      runInAction(() => {
+        this.filter(textQuery);
+        this.isWaitingFilters = false;
+      });
+    },
+    150,
+  );
+
+  @action.bound
+  filterWithDebouncing(textQuery: string) {
+    this.displayingTextQuery = textQuery;
+    const trimmedQuery = textQuery.trim();
+    if (textQuery === '' || trimmedQuery === textQuery || trimmedQuery.length !== 0) {
+      this.isWaitingFilters = true;
+      this.filtrationDebouncer.run(trimmedQuery);
+    }
   }
 }
 

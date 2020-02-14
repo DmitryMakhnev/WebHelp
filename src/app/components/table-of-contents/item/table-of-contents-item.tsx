@@ -3,7 +3,6 @@ import { observer } from 'mobx-react';
 import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 import { TableOfContentsPageViewRepresentation } from '../../../higher-order-components/table-of-contents-panel/view-model/tree/table-of-contents-page-view-representation';
-import { jsxIf } from '../../../../lib/jsx/jsx-if';
 import { TableOfContentsAnchors } from '../anchors/table-of-contents-anchors';
 import { ArrowIcon } from '../../icons/arrow/arrow-iocn';
 import { Action } from '../../action/action';
@@ -15,9 +14,9 @@ export const ITEM_ID_ATTRIBUTE = 'data-item-id';
 interface TableOfContentsListItemProps {
   className?: string,
   pageViewRepresentation: TableOfContentsPageViewRepresentation;
-  showSubPages: () => void;
-  toggleSubPages: () => void;
-  selectPage: () => void;
+  showSubPages: (representation: TableOfContentsPageViewRepresentation) => void;
+  toggleSubPages: (representation: TableOfContentsPageViewRepresentation) => void;
+  selectPage: (representation: TableOfContentsPageViewRepresentation) => void;
   selectAnchor: (anchorId: TableOfContentsAnchorId) => void;
 }
 
@@ -26,12 +25,29 @@ export const TableOfContentsListItem: FC<TableOfContentsListItemProps> = observe
   const page = pageViewRepresentation.page;
   const pageLevel = page.level;
   const isSubPagesShowed = pageViewRepresentation.isSubPagesShowed;
+  const representationCallbacksDeps = [pageViewRepresentation];
 
   const intel = useIntl();
 
   const rootRef = useRef<HTMLDivElement>(null);
   const shouldHaveContentAnimations = pageViewRepresentation.shouldHaveContentAnimations;
   const shouldHaveSelectionAnimations = pageViewRepresentation.shouldHaveSelectionAnimations;
+
+  const onItemTextClick = useCallback(
+    (e: MouseEvent<HTMLAnchorElement>) => {
+      e.preventDefault();
+      props.selectPage(pageViewRepresentation);
+      props.showSubPages(pageViewRepresentation);
+    },
+    representationCallbacksDeps,
+  );
+
+  const onToggleClick = useCallback(
+    () => {
+      props.toggleSubPages(pageViewRepresentation);
+    },
+    representationCallbacksDeps,
+  );
 
   useLayoutEffect(() => {
     const root = rootRef.current;
@@ -67,13 +83,7 @@ export const TableOfContentsListItem: FC<TableOfContentsListItemProps> = observe
         styles.animate,
       );
     }
-  }, []);
-
-  const onItemTextClick = useCallback((e: MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    props.selectPage();
-    props.showSubPages();
-  }, []);
+  }, representationCallbacksDeps);
 
   return (
     <div
@@ -92,10 +102,10 @@ export const TableOfContentsListItem: FC<TableOfContentsListItemProps> = observe
           {page.title}
         </a>
 
-        {jsxIf(pageViewRepresentation.hasChildren, () => (
+        {pageViewRepresentation.hasChildren && (
           <Action
             className={styles.toggleAction}
-            on={props.toggleSubPages}
+            on={onToggleClick}
             ariaLabel={intel.formatMessage(
               isSubPagesShowed
                 ? {
@@ -115,18 +125,15 @@ export const TableOfContentsListItem: FC<TableOfContentsListItemProps> = observe
               )}
             />
           </Action>
-        )) }
+        )}
       </div>
-      { jsxIf(
-        pageViewRepresentation.isSelected && pageViewRepresentation.anchors != null,
-        () => (
-          <TableOfContentsAnchors
-            shouldHaveAnimation={shouldHaveSelectionAnimations}
-            selectAnchor={props.selectAnchor}
-            anchors={pageViewRepresentation.anchors as TableOfContentsAnchor[]}
-            pageLevel={pageLevel}
-          />
-        ),
+      { pageViewRepresentation.isSelected && pageViewRepresentation.anchors != null && (
+        <TableOfContentsAnchors
+          shouldHaveAnimation={shouldHaveSelectionAnimations}
+          selectAnchor={props.selectAnchor}
+          anchors={pageViewRepresentation.anchors as TableOfContentsAnchor[]}
+          pageLevel={pageLevel}
+        />
       )}
     </div>
   );

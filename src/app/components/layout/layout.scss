@@ -9,15 +9,16 @@
     top: 0;
     left: 0;
     width: 100%;
-    z-index: $site-header-z-index;
+    z-index: $site-fixed-panel-z-index;
     }
 
-  .TableOfContentsPanel {
+  .tableOfContentsPanel {
     position: fixed;
     top: $layout-header-height;
     left: 0;
     bottom: 0;
     width: $layout-contents-panel-width;
+    z-index: $site-fixed-panel-z-index;
     }
 
   .mainContent {

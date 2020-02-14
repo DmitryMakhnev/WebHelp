@@ -1,0 +1,19 @@
+@import "../../../../styles/vars-and-mixins";
+
+.root {
+  --icon-color: #{$default-micro-icon-color};
+  width: 16px;
+  height: 16px;
+  fill: var(--icon-color, $default-micro-icon-color);
+  will-change: transform;
+  animation: rotationLoop .8s linear 0s infinite;
+  }
+
+@keyframes rotationLoop {
+  from {
+    transform: rotate(0);
+    }
+  to {
+    transform: rotate(360deg);
+    }
+  }

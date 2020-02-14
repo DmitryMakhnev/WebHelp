@@ -1,5 +1,9 @@
 @import "../../../styles/vars-and-mixins";
 
-.tableOfContentsFilter {
-
+.root {
+  //border-bottom: 1px solid $default-separator-color;
   }
+
+  .input {
+    width: 100%;
+    }

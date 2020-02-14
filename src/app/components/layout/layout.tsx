@@ -7,7 +7,7 @@ import styles from './layout.scss';
 export const Layout: FC<{}> = () => (
   <div className={styles.root}>
     <Header className={styles.header} />
-    <TableOfContentsPanelHoc className={styles.TableOfContentsPanel} />
+    <TableOfContentsPanelHoc className={styles.tableOfContentsPanel} />
     <MainContent className={styles.mainContent} />
   </div>
 );
