@@ -10,7 +10,7 @@ export class TableOfContentsPanelViewModel {
 
   @computed
   get treeDataLoadingState() {
-    return this.tableOfContentsModel.fetchingDataState.state;
+    return this.tableOfContentsModel.fetchingDataState.asFlags;
   }
 
   @computed

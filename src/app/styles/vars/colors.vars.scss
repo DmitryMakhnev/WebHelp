@@ -1,6 +1,10 @@
 
 $default-font-color: #333;
 
+$default-action-text-color: $default-font-color;
+$default-action-text-color-hover: #000;
+$default-action-text-background-color: rgba(0, 0, 0, 0.10);
+$default-action-text-background-color-hover: rgba(0, 0, 0, 0.15);
 
 $default-navigation-block-background: #fff;
 
@@ -15,3 +19,7 @@ $selection-color_hover: #EAEAEA;
 $default-input-text-color: $default-font-color;
 $default-input-placeholder-color: #27282c;
 
+$default-loading-stub-element-color: #F4F4F4;
+
+$error-messages-background-color: #FFDFDF;
+$info-messages-background-color: #f3f3f3;

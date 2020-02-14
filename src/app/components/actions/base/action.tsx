@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import classNames from 'classnames';
 import style from './action.scss';
 
-interface ActionProps {
+export interface ActionProps {
   className?: string;
   ariaLabel: string;
   on: () => void;

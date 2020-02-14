@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import { TableOfContentsPageViewRepresentation } from '../../../higher-order-components/table-of-contents-panel/view-model/tree/table-of-contents-page-view-representation';
 import { TableOfContentsAnchors } from '../anchors/table-of-contents-anchors';
 import { ArrowIcon } from '../../icons/arrow/arrow-iocn';
-import { Action } from '../../action/action';
+import { Action } from '../../actions/base/action';
 import styles from './table-of-contents-item.scss';
 
 // if you would like to change it please sync with attribute in component

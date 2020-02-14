@@ -1,0 +1,31 @@
+@import "../../../styles/vars-and-mixins";
+
+.root {
+
+  }
+
+  .content {
+    display: flex;
+    align-items: center;
+    }
+
+    .text {
+      font-family: $default-font-family;
+      color: $default-action-text-color;
+      font-size: $default-font-size;
+      display: inline-block;
+      padding: $grid-module $grid-module-3x;
+      background-color: $default-action-text-background-color;
+      border-radius: $big-border-radius;
+      will-change: background-color, color;
+      transition: background-color $default-animation-function $default-little-animation-duration,
+        color $default-animation-function $default-little-animation-duration;
+      }
+      .root:hover .text {
+        color: $default-action-text-color-hover;
+        background-color: $default-action-text-background-color-hover;
+        }
+
+    .loader {
+      margin-left: $grid-module_2x;
+      }

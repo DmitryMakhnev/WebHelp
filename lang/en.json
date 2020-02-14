@@ -1,5 +1,8 @@
 {
   "tableOfContents.hideSubPages": "Hide children pages",
   "tableOfContents.showSubPages": "Show children pages",
-  "tableOfContents.searchLabel": "Find pages..."
+  "tableOfContents.searchLabel": "Find pages...",
+  "tableOfContents.loadingErrorMessage": "Problems with loading table of contents. Please try later.",
+  "tableOfContents.noItemsFound": "Unfortunately we couldn't find any page.",
+  "tableOfContents.retryLoadingAction": "Retry load pages"
 }

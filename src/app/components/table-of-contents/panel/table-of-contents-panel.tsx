@@ -1,7 +1,7 @@
 import React, { FC, useCallback } from 'react';
 import classNames from 'classnames';
 import { observer } from 'mobx-react';
-import styles from './table-of-contents-panel.scss';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { ChunkedRenderList } from '../../chunked-render-list/chunked-render-list';
 import { TableOfContentsPanelViewModel } from '../../../higher-order-components/table-of-contents-panel/view-model/table-of-contents-panel.view-model';
 import { TableOfContentsFilter } from '../filter/table-of-contents-filter';
@@ -9,10 +9,16 @@ import { ITEM_ID_ATTRIBUTE, TableOfContentsListItem } from '../item/table-of-con
 import { TableOfContentsPageViewRepresentation } from '../../../higher-order-components/table-of-contents-panel/view-model/tree/table-of-contents-page-view-representation';
 import { TableOfContentsTree } from '../../../higher-order-components/table-of-contents-panel/view-model/tree/table-of-contents-tree';
 import { TableOfContentsChildrenModificationRepresentation } from '../../../higher-order-components/table-of-contents-panel/view-model/tree/children-representation/table-of-contents-children-modification-representation';
+import { ListLoadingStub } from '../../stubs/loading/list/list-loading-stub';
+import { ErrorMessage } from '../../meaages/error/error-message';
+import styles from './table-of-contents-panel.scss';
+import { InfoMessage } from '../../meaages/info/info-message';
+import { TextActionWithLoader } from '../../actions/text-with-loader/text-action-with-loader';
 
 export interface TableOfContentsPanelProps {
   className?: string;
   viewModel: TableOfContentsPanelViewModel;
+  retryToLoadingData: () => void;
 }
 
 export const TableOfContentsPanel: FC<TableOfContentsPanelProps> = observer(props => {
@@ -28,6 +34,8 @@ export const TableOfContentsPanel: FC<TableOfContentsPanelProps> = observer(prop
     },
     treeCallbacksDeps,
   );
+
+  const treeDataLoadingState = viewModel.treeDataLoadingState;
 
   const renderItem = useCallback(
     (
@@ -49,9 +57,37 @@ export const TableOfContentsPanel: FC<TableOfContentsPanelProps> = observer(prop
     treeCallbacksDeps,
   );
 
+  const intl = useIntl();
+  const retryLoadingText = intl.formatMessage({
+    id: 'tableOfContents.retryLoadingAction',
+    defaultMessage: 'Retry',
+  });
+
   return (
     <div className={classNames(styles.tableOfContentsPanel, props.className)}>
-      {tree != null && (
+      {treeDataLoadingState.isLoading && (
+        <ListLoadingStub className={styles.loadingStub} />
+      )}
+      {treeDataLoadingState.hasFailureDuringLoading && (
+        <ErrorMessage
+          className={styles.message}
+          actions={(
+            <TextActionWithLoader
+              showLoader={treeDataLoadingState.isLoadingAfterFailure}
+              ariaLabel={retryLoadingText}
+              on={props.retryToLoadingData}
+            >
+              {retryLoadingText}
+            </TextActionWithLoader>
+          )}
+        >
+          <FormattedMessage
+            id="tableOfContents.loadingErrorMessage"
+            defaultMessage="Something go wrong. Please try later"
+          />
+        </ErrorMessage>
+      )}
+      {treeDataLoadingState.hasData && tree != null && (
         <>
           <div className={styles.top}>
             <TableOfContentsFilter className={styles.filters} tree={tree} />
@@ -70,7 +106,12 @@ export const TableOfContentsPanel: FC<TableOfContentsPanelProps> = observer(prop
               />
             )
             : (
-              <div>Empty</div>
+              <InfoMessage className={styles.message}>
+                <FormattedMessage
+                  id="tableOfContents.noItemsFound"
+                  defaultMessage="No items found"
+                />
+              </InfoMessage>
             )}
         </>
       )}
