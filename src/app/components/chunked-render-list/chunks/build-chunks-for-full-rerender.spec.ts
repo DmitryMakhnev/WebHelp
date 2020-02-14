@@ -1,7 +1,7 @@
-import { createItems } from './test-tuils/create-items';
+import { createItems } from './test-utils/create-items';
 import { buildChunksForFullRerender } from './build-chunks-for-full-rerender';
 import { createChunkId } from './chunk-id-factory';
-import { getIdsOfItemsAsSet } from './test-tuils/get-ids-of-items-as-set';
+import { getIdsOfItemsAsSet } from './test-utils/get-ids-of-items-as-set';
 import { getMapKeysAsSet } from '../../../../lib/test-utils/get-map-keys-as-set';
 
 const TEST_CHUNK_SIZE = 10;

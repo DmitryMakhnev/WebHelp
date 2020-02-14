@@ -1,12 +1,12 @@
 import { buildChunksForAppendRender } from './build-chunks-for-append-render';
 import { createChunkId } from './chunk-id-factory';
-import { createItems } from './test-tuils/create-items';
+import { createItems } from './test-utils/create-items';
 import { ChunkedRenderListItem } from '../chunked-render-list-item';
 import { getMapKesAsArray } from '../../../../lib/test-utils/get-map-keys-as-array';
 import { ChunkedRenderListItemsChunkModel } from './chunked-render-list-items-chunk-model';
-import { DEFAULT_CHUNK_SIZE_FOR_TESTS } from './test-tuils/build-chunks-test-consts';
-import { CreatedInitialChunksDataResult, createInitialChunksData } from './test-tuils/create-initial-chunks-data';
-import { getIdsOfItemsAsArray } from './test-tuils/get-ids-of-items-as-array';
+import { DEFAULT_CHUNK_SIZE_FOR_TESTS } from './test-utils/build-chunks-test-consts';
+import { CreatedInitialChunksDataResult, createInitialChunksData } from './test-utils/create-initial-chunks-data';
+import { getIdsOfItemsAsArray } from './test-utils/get-ids-of-items-as-array';
 
 const APPENDED_PREFIX = 'appended_';
 

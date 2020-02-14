@@ -1,5 +1,5 @@
 import { buildChunksForIndependentPartRender } from './build-chunks-for-independent-part-render';
-import { createItems } from './test-tuils/create-items';
+import { createItems } from './test-utils/create-items';
 import { ChunkedRenderListItemsModification } from '../chunked-render-list-items-modification';
 import { ChunkedRenderListItem } from '../chunked-render-list-item';
 import { createChunkId } from './chunk-id-factory';

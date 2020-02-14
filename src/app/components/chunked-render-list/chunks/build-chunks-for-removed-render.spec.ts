@@ -1,11 +1,11 @@
 import { ChunkedRenderListItem } from '../chunked-render-list-item';
-import { createItemsForRemoving, ItemsForRemovingCreationResult } from './test-tuils/create-items-for-removing';
-import { createInitialChunksData } from './test-tuils/create-initial-chunks-data';
+import { createItemsForRemoving, ItemsForRemovingCreationResult } from './test-utils/create-items-for-removing';
+import { createInitialChunksData } from './test-utils/create-initial-chunks-data';
 import { buildChunksForRemovedRerender } from './build-chunks-for-removed-render';
 import { createChunkId } from './chunk-id-factory';
 import { ChunkedRenderListItemsChunkModel } from './chunked-render-list-items-chunk-model';
 import { getMapKesAsArray } from '../../../../lib/test-utils/get-map-keys-as-array';
-import { getIdsOfItemsAsArray } from './test-tuils/get-ids-of-items-as-array';
+import { getIdsOfItemsAsArray } from './test-utils/get-ids-of-items-as-array';
 
 const REMOVED_PREFIX = 'removed_';
 
