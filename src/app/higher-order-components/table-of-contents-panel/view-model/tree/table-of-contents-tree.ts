@@ -1,9 +1,9 @@
 import { action, computed, observable, runInAction } from 'mobx';
 import { sortTableOfContentsInputDataForTree } from './utils/sort-table-of-contents-input-data-for-tree';
-import { TableOfContentsChildrenModificationRepresentation } from './children-representation/table-of-contents-children-modification-representation';
-import { createInitialChildrenRepresentation } from './children-representation/create-initial-children-representation';
-import { createFilteredChildrenRepresentation } from './children-representation/create-filtered-children-representation';
-import { createRestoredChildrenRepresentation } from './children-representation/create-restored-children-representation';
+import { TableOfContentsChildrenModification } from './children-modification/table-of-contents-children-modification';
+import { createInitialChildrenModification } from './children-modification/create-initial-children-modification';
+import { createFilteredChildrenModification } from './children-modification/create-filtered-children-modification';
+import { createRestoredChildrenModification } from './children-modification/create-restored-children-modification';
 import { resolveSearchAction } from './utils/resolve-serch-action';
 import { createPageViewRepresentations } from './utils/create-page-view-representations';
 import { TableOfContentsPageViewRepresentation } from './table-of-contents-page-view-representation';
@@ -11,11 +11,11 @@ import {
   createPageViewRepresentationsByIdIndex,
   TableOfContentsPageViewRepresentationById,
 } from './utils/create-page-view-representations-by-id-index';
-import { createChildrenAppendedChildrenRepresentation } from './children-representation/create-children-appended-children-representation';
-import { createChildrenRemovedChildrenRepresentation } from './children-representation/create-children-removed-children-representation';
+import { createChildrenAppendedChildrenModification } from './children-modification/create-children-appended-children-modification';
+import { createChildrenRemovedChildrenModification } from './children-modification/create-children-removed-children-modification';
 import { restoreTableOfContentsViewRepresentationChildren } from './utils/restore-table-of-contents-view-representation-children';
 import { ChunkedListModificationHolder } from '../../../../components/chunked-list/types/chunked-list-modification-holder';
-import { createAddingIndependentPartChildrenRepresentation } from './children-representation/create-adding-independent-part-children-representation';
+import { createAddingIndependentPartChildrenModification } from './children-modification/create-adding-independent-part-children-modification';
 import { getPathToPageRepresentationFromRoot } from './utils/get-path-to-page-representation-from-root';
 import { Debouncer } from '../../../../../lib/debounce/debouncer';
 
@@ -23,7 +23,7 @@ export class TableOfContentsTree
 implements
   ChunkedListModificationHolder<
     TableOfContentsPageViewRepresentation,
-    TableOfContentsChildrenModificationRepresentation
+    TableOfContentsChildrenModification
   > {
   constructor(private readonly tableOfContents: TableOfContentsApiResponse) {
     const sortedPages = sortTableOfContentsInputDataForTree(tableOfContents);
@@ -34,7 +34,7 @@ implements
     this.pageViewRepresentationsById = createPageViewRepresentationsByIdIndex(
       this.sortedPageViewRepresentations,
     );
-    this.childrenModification = createInitialChildrenRepresentation(
+    this.childrenModification = createInitialChildrenModification(
       tableOfContents,
       this.pageViewRepresentationsById,
     );
@@ -45,10 +45,10 @@ implements
   private pageViewRepresentationsById: TableOfContentsPageViewRepresentationById;
 
   // eslint-disable-next-line max-len
-  private childrenRepresentationBeforeSearch: TableOfContentsChildrenModificationRepresentation | null = null;
+  private childrenModificationBeforeSearch: TableOfContentsChildrenModification | null = null;
 
   @observable.ref
-  childrenModification: TableOfContentsChildrenModificationRepresentation;
+  childrenModification: TableOfContentsChildrenModification;
 
   @computed
   get hasChildrenForDisplaying() {
@@ -70,7 +70,7 @@ implements
     if (pageViewRepresentation.hasChildren && !pageViewRepresentation.isSubPagesShowed) {
       pageViewRepresentation.setShouldHaveContentAnimations(true);
       pageViewRepresentation.setIsSubPagesShowed(true);
-      this.childrenModification = createChildrenAppendedChildrenRepresentation(
+      this.childrenModification = createChildrenAppendedChildrenModification(
         this.childrenModification,
         pageViewRepresentation,
         this.pageViewRepresentationsById,
@@ -83,7 +83,7 @@ implements
     if (pageViewRepresentation.hasChildren && pageViewRepresentation.isSubPagesShowed) {
       pageViewRepresentation.setShouldHaveContentAnimations(true);
       pageViewRepresentation.setIsSubPagesShowed(false);
-      this.childrenModification = createChildrenRemovedChildrenRepresentation(
+      this.childrenModification = createChildrenRemovedChildrenModification(
         this.childrenModification,
         pageViewRepresentation,
         this.pageViewRepresentationsById,
@@ -140,7 +140,7 @@ implements
         this.pageViewRepresentationsById,
         pageId,
       ) as TableOfContentsPageId[];
-      this.childrenModification = createAddingIndependentPartChildrenRepresentation(
+      this.childrenModification = createAddingIndependentPartChildrenModification(
         this.childrenModification,
         this.pageViewRepresentationsById.get(pageId) as TableOfContentsPageViewRepresentation,
         this.pageViewRepresentationsById,
@@ -168,15 +168,15 @@ implements
     switch (resolveSearchAction(textQuery, this.isInSearchMode)) {
       case 'START':
         this.isInSearchMode = true;
-        this.childrenRepresentationBeforeSearch = this.childrenModification;
-        this.childrenModification = createFilteredChildrenRepresentation(
+        this.childrenModificationBeforeSearch = this.childrenModification;
+        this.childrenModification = createFilteredChildrenModification(
           this.sortedPageViewRepresentations,
           this.pageViewRepresentationsById,
           textQuery,
         );
         break;
       case 'CONTINUE':
-        this.childrenModification = createFilteredChildrenRepresentation(
+        this.childrenModification = createFilteredChildrenModification(
           this.sortedPageViewRepresentations,
           this.pageViewRepresentationsById,
           textQuery,
@@ -185,12 +185,12 @@ implements
       case 'STOP':
         this.isInSearchMode = false;
         restoreTableOfContentsViewRepresentationChildren(this.sortedPageViewRepresentations);
-        this.childrenModification = createRestoredChildrenRepresentation(
+        this.childrenModification = createRestoredChildrenModification(
           this
             // eslint-disable-next-line max-len
-            .childrenRepresentationBeforeSearch as TableOfContentsChildrenModificationRepresentation,
+            .childrenModificationBeforeSearch as TableOfContentsChildrenModification,
         );
-        this.childrenRepresentationBeforeSearch = null;
+        this.childrenModificationBeforeSearch = null;
         break;
     }
 
@@ -210,13 +210,30 @@ implements
     150,
   );
 
-  @action.bound
-  filterWithDebouncing(textQuery: string) {
+  @action
+  private prepareTextQuery(textQuery: string) {
     this.displayingTextQuery = textQuery;
     const trimmedQuery = textQuery.trim();
-    if (textQuery === '' || trimmedQuery === textQuery || trimmedQuery.length !== 0) {
+    return {
+      trimmedQuery,
+      canFilter: textQuery === '' || trimmedQuery === textQuery || trimmedQuery.length !== 0,
+    };
+  }
+
+  @action.bound
+  filteringFormOutside(textQuery: string) {
+    const preparingQuery = this.prepareTextQuery(textQuery);
+    if (preparingQuery.canFilter) {
+      this.filter(preparingQuery.trimmedQuery);
+    }
+  }
+
+  @action.bound
+  filterWithDebouncing(textQuery: string) {
+    const preparingQuery = this.prepareTextQuery(textQuery);
+    if (preparingQuery.canFilter) {
       this.isWaitingFilters = true;
-      this.filtrationDebouncer.run(trimmedQuery);
+      this.filtrationDebouncer.run(preparingQuery.trimmedQuery);
     }
   }
 }

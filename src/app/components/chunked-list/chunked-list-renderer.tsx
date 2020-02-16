@@ -3,8 +3,8 @@ import classNames from 'classnames';
 import { ChunkedListItem } from './types/chunked-list-item';
 import { ChunkedListItemsModification } from './types/chunked-list-items-modification';
 import { ChunkedRenderListItemsChunkModel } from './chunks/chunked-render-list-items-chunk-model';
-import { ChunkedListAppendingAnimatedChunk } from './chunks/animations/build-in/chunked-list-appending-animated-chunk';
-import { ChunkedListRemovingAnimatedChunk } from './chunks/animations/build-out/chunked-list-removing-animated-chunk';
+import { ChunkedListAppendingAnimatedChunk } from './chunks/animations/appending/chunked-list-appending-animated-chunk';
+import { ChunkedListRemovingAnimatedChunk } from './chunks/animations/removing/chunked-list-removing-animated-chunk';
 import { ChunkedListItemsChunk } from './chunks/chunked-list-items-chunk';
 import styles from './chunked-list-renderer.scss';
 

@@ -1,4 +1,4 @@
-import { TableOfContentsChildrenModificationRepresentation } from './table-of-contents-children-modification-representation';
+import { TableOfContentsChildrenModification } from './table-of-contents-children-modification';
 import { TableOfContentsPageViewRepresentation } from '../table-of-contents-page-view-representation';
 import { TableOfContentsPageViewRepresentationById } from '../utils/create-page-view-representations-by-id-index';
 import { ChunkedListItemsModificationType } from '../../../../../components/chunked-list/types/chunked-list-items-modification-type';
@@ -44,13 +44,13 @@ function addPageChildrenIfThemNotAdded(
   };
 }
 
-export function createAddingIndependentPartChildrenRepresentation(
-  currentChildrenRepresentation: TableOfContentsChildrenModificationRepresentation,
+export function createAddingIndependentPartChildrenModification(
+  currentChildrenRepresentation: TableOfContentsChildrenModification,
   currentPageViewRepresentation: TableOfContentsPageViewRepresentation,
   pageViewRepresentationsById: TableOfContentsPageViewRepresentationById,
   pathToPageFromRoot: TableOfContentsPageId[],
   isRequiredToShowChildren: boolean = false,
-): TableOfContentsChildrenModificationRepresentation {
+): TableOfContentsChildrenModification {
   const childrenOfCurrentRepresentation = currentChildrenRepresentation.children;
 
   let resultChildren: TableOfContentsPageViewRepresentation[] = childrenOfCurrentRepresentation;

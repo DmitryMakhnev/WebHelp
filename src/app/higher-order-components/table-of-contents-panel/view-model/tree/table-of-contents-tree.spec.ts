@@ -10,8 +10,8 @@ const tableOfContentsFixture: TableOfContentsApiResponse = (HelpTOCJson as unkno
 
 describe('TableOfContentsTree', () => {
   // TODO [dmitry.makhnev]: add all tests for all cases
+  // at this time in general we depends on chunked lists tests
   describe('selectPageFromOutside', () => {
-    // TODO [dmitry.makhnev]: check page representations states
     it('select top level page', () => {
       const firstFirsLevelPageId = tableOfContentsFixture.topLevelIds[0];
       const tree = createTableOfContentsTree(tableOfContentsFixture);

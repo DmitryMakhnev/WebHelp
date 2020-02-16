@@ -1,12 +1,12 @@
-import { TableOfContentsChildrenModificationRepresentation } from './table-of-contents-children-modification-representation';
+import { TableOfContentsChildrenModification } from './table-of-contents-children-modification';
 import { TableOfContentsPageViewRepresentation } from '../table-of-contents-page-view-representation';
 import { TableOfContentsPageViewRepresentationById } from '../utils/create-page-view-representations-by-id-index';
 
-export function createChildrenAppendedChildrenRepresentation(
-  currentChildrenRepresentation: TableOfContentsChildrenModificationRepresentation,
+export function createChildrenAppendedChildrenModification(
+  currentChildrenRepresentation: TableOfContentsChildrenModification,
   currentPageViewRepresentation: TableOfContentsPageViewRepresentation,
   pageViewRepresentationsById: TableOfContentsPageViewRepresentationById,
-): TableOfContentsChildrenModificationRepresentation {
+): TableOfContentsChildrenModification {
   const appendedChildren: TableOfContentsPageViewRepresentation[] = [];
 
   currentPageViewRepresentation.currentChildren.forEach(pageId => {

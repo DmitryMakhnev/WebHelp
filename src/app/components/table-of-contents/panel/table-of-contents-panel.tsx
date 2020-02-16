@@ -7,7 +7,7 @@ import { TableOfContentsFilter } from '../filter/table-of-contents-filter';
 import { ITEM_ID_ATTRIBUTE, TableOfContentsListItem } from '../item/table-of-contents-item';
 import { TableOfContentsPageViewRepresentation } from '../../../higher-order-components/table-of-contents-panel/view-model/tree/table-of-contents-page-view-representation';
 import { TableOfContentsTree } from '../../../higher-order-components/table-of-contents-panel/view-model/tree/table-of-contents-tree';
-import { TableOfContentsChildrenModificationRepresentation } from '../../../higher-order-components/table-of-contents-panel/view-model/tree/children-representation/table-of-contents-children-modification-representation';
+import { TableOfContentsChildrenModification } from '../../../higher-order-components/table-of-contents-panel/view-model/tree/children-modification/table-of-contents-children-modification';
 import { ListLoadingStub } from '../../stubs/loading/list/list-loading-stub';
 import { ErrorMessage } from '../../meaages/error/error-message';
 import { InfoMessage } from '../../meaages/info/info-message';
@@ -99,7 +99,7 @@ export const TableOfContentsPanel: FC<TableOfContentsPanelProps> = observer(prop
             ? (
               <ChunkedList<
                   TableOfContentsPageViewRepresentation,
-                  TableOfContentsChildrenModificationRepresentation
+                  TableOfContentsChildrenModification
                 >
                 className={styles.list}
                 listModificationHolder={tree}

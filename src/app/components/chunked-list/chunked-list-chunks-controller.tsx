@@ -104,8 +104,10 @@ export class ChunkedListChunksController<
 
   componentDidMount(): void {
     const childrenRepresentationHolder = this.props.listModificationHolder;
-    // for MobX based approach is comfortable to use MobX.
-    // If You would like to use this list with not MobX stack please
+    // for MobX based approach is comfortable to use MobX only
+    // If you would like to use this component with not MobX stack
+    // please refactor this in this way
+    // https://reactjs.org/docs/higher-order-components.html#use-hocs-for-cross-cutting-concerns
     this.childrenModificationReactionDisposer = reaction(
       () => childrenRepresentationHolder.childrenModification,
       childrenModification => {

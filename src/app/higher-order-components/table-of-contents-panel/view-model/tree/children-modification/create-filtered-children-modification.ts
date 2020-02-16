@@ -1,14 +1,14 @@
-import { TableOfContentsChildrenModificationRepresentation } from './table-of-contents-children-modification-representation';
+import { TableOfContentsChildrenModification } from './table-of-contents-children-modification';
 import { TableOfContentsPageViewRepresentation } from '../table-of-contents-page-view-representation';
 import { findPageIdsForFilter } from '../utils/find-page-ids-for-filter';
 import { TableOfContentsPageViewRepresentationById } from '../utils/create-page-view-representations-by-id-index';
 import { filterSet } from '../../../../../../lib/sets/filter-set';
 
-export function createFilteredChildrenRepresentation(
+export function createFilteredChildrenModification(
   sortedPageViewRepresentations: TableOfContentsPageViewRepresentation[],
   pageViewRepresentationsById: TableOfContentsPageViewRepresentationById,
   textQuery: string,
-): TableOfContentsChildrenModificationRepresentation {
+): TableOfContentsChildrenModification {
   // search
   const foundPageIds = findPageIdsForFilter(
     sortedPageViewRepresentations,

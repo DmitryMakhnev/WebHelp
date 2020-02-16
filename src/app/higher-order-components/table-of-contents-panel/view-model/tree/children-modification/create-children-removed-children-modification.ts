@@ -1,13 +1,13 @@
-import { TableOfContentsChildrenModificationRepresentation } from './table-of-contents-children-modification-representation';
+import { TableOfContentsChildrenModification } from './table-of-contents-children-modification';
 import { TableOfContentsPageViewRepresentation } from '../table-of-contents-page-view-representation';
 import { TableOfContentsPageViewRepresentationById } from '../utils/create-page-view-representations-by-id-index';
 import { getAllShowedChildrenIdsOfTableOfContentsRepresentation } from '../utils/get-all-showed-children-ids-of-table-of-contents-representation';
 
-export function createChildrenRemovedChildrenRepresentation(
-  currentChildrenRepresentation: TableOfContentsChildrenModificationRepresentation,
+export function createChildrenRemovedChildrenModification(
+  currentChildrenRepresentation: TableOfContentsChildrenModification,
   currentPageViewRepresentation: TableOfContentsPageViewRepresentation,
   pageViewRepresentationsById: TableOfContentsPageViewRepresentationById,
-): TableOfContentsChildrenModificationRepresentation {
+): TableOfContentsChildrenModification {
   const allShowedChildrenIds = getAllShowedChildrenIdsOfTableOfContentsRepresentation(
     currentPageViewRepresentation,
     pageViewRepresentationsById,

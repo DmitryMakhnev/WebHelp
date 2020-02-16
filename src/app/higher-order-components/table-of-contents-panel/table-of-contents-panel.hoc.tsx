@@ -26,7 +26,7 @@ export const TableOfContentsPanelHoc: FC<TableOfContentsPanelHOCProps> = observe
       };
       WEB_HELP_OUTSIDE_API.filterByText = text => {
         if (tableOfContentsViewModel.tree) {
-          tableOfContentsViewModel.tree.filter(text);
+          tableOfContentsViewModel.tree.filteringFormOutside(text);
         }
       };
       // first data fetching

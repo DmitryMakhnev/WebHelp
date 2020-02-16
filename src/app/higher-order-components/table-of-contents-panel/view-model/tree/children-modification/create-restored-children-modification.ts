@@ -1,8 +1,8 @@
-import { TableOfContentsChildrenModificationRepresentation } from './table-of-contents-children-modification-representation';
+import { TableOfContentsChildrenModification } from './table-of-contents-children-modification';
 
-export function createRestoredChildrenRepresentation(
-  childrenRepresentation: TableOfContentsChildrenModificationRepresentation,
-): TableOfContentsChildrenModificationRepresentation {
+export function createRestoredChildrenModification(
+  childrenRepresentation: TableOfContentsChildrenModification,
+): TableOfContentsChildrenModification {
   // sync showed pages states
   const children = childrenRepresentation.children;
   children.forEach((child, index) => {
