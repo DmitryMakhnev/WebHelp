@@ -1,0 +1,13 @@
+@import "../../../styles/vars-and-mixins";
+
+.root {
+  padding: $grid-module_4x;
+  background-color: $error-messages-background-color;
+  font-family: $default-font-family;
+  color: $default-font-color;
+  font-size: $default-font-size;
+  }
+
+  .actions {
+    margin-top: $grid-module_4x;
+    }

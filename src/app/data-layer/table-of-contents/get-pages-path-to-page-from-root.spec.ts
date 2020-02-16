@@ -3,13 +3,13 @@ import { getPagesPathToPageFromRoot } from './get-pages-path-to-page-from-root';
 import { findFirstPageOfLevel } from './test-utils/find-first-page-of-level';
 import { IncorrectFixtureError } from '../../../lib/errors/incorrect-fixture-error';
 
-const response: TableOfContentsApiResponse = HelpTOCJson as unknown as TableOfContentsApiResponse;
+const response: TableOfContentsApiResponse = (HelpTOCJson as unknown) as TableOfContentsApiResponse;
 
 describe('getPagesPathToPageFromRoot', () => {
   it('works correct', () => {
     const pageOfThirdLevel = findFirstPageOfLevel(response, 2);
     if (!pageOfThirdLevel) {
-      throw new IncorrectFixtureError('don\'t have any page of this level');
+      throw new IncorrectFixtureError("don't have any page of this level");
     }
     const path = getPagesPathToPageFromRoot(
       response,

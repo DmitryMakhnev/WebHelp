@@ -1,0 +1,25 @@
+@import "../../../styles/vars-and-mixins";
+
+.tableOfContentsPanel {
+  box-sizing: border-box;
+  border-right: 1px solid $default-separator-color;
+  //padding: $grid-module_6x $grid-module_8x;
+  display: flex;
+  flex-flow: column;
+  }
+
+  .top {
+    margin: -1px -1px 0;
+    }
+
+  .list {
+    flex-grow: 1;
+    }
+
+  .loadingStub {
+    margin: $grid-module_6x $grid-module_8x;
+    }
+
+  .message {
+    margin: $grid-module_6x;
+    }

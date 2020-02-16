@@ -1,6 +1,12 @@
 module.exports = {
   extends: ['airbnb-typescript'],
   rules: {
+    '@typescript-eslint/indent': [1],
+    'react/sort-comp': [0],
+    'function-paren-newline': [0],
+    'implicit-arrow-linebreak': [0],
+    'operator-linebreak': [0],
+    'object-curly-newline': [0],
     'arrow-parens': [2, 'as-needed'],
     'prefer-destructuring': 0,
     'import/named': 0,

@@ -1,0 +1,2 @@
+
+export const DEFAULT_CHUNK_SIZE_FOR_TESTS = 10;

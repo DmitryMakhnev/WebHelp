@@ -24,6 +24,8 @@ export class TableOfContentsFetchingController {
           runInAction(() => {
             tableOfContentsModel.setDataFetchingError(error).fetchingDataState.fail();
           });
+          // it's painfully fro me to work with errors handling without Either (https://www.youtube.com/watch?v=T6Os27MKUCQ)
+          // but for this task I'm really trying
           throw error;
         },
       );
@@ -32,5 +34,11 @@ export class TableOfContentsFetchingController {
 
   fetch(): Promise<TableOfContentsApiResponse> {
     return this.deduplication.run();
+  }
+
+  runFetching() {
+    this.fetch().catch(() => {
+      // TODO [dmitry.makhnev]: log error
+    });
   }
 }

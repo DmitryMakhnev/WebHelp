@@ -1,12 +1,6 @@
-import React,
-{
-  FC,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
 import { observer } from 'mobx-react';
-import { TableOfContentsPanel } from '../../components/table-of-contents-panel/table-of-contents-panel';
+import { TableOfContentsPanel } from '../../components/table-of-contents/panel/table-of-contents-panel';
 import { DataLayerConnectionContext } from '../../contexts/data-layer-connection.context';
 import { createTableOfContentsPanelViewModel } from './view-model/table-of-contents-panel.view-model';
 
@@ -15,32 +9,44 @@ export type TableOfContentsPanelHOCProps = {
 };
 
 export const TableOfContentsPanelHoc: FC<TableOfContentsPanelHOCProps> = observer(props => {
-  console.log('render hoc');
-
   const dataLayerConnection = useContext(DataLayerConnectionContext);
+  const dataLayerConnectionDeps = [dataLayerConnection];
 
-  const [tableOfContentsViewModel] = useState(
-    () => createTableOfContentsPanelViewModel(
-      dataLayerConnection.tableOfContentsModel,
-    ),
+  const [tableOfContentsViewModel] = useState(() =>
+    createTableOfContentsPanelViewModel(dataLayerConnection.tableOfContentsModel),
   );
 
-  useEffect(() => {
-    console.log('hok run effect');
-    WEB_HELP_OUTSIDE_API.selectByPageId = pageId => tableOfContentsViewModel
-      .tree.selectByPageId(pageId, true);
-    WEB_HELP_OUTSIDE_API.filterByText = text => tableOfContentsViewModel.tree.filterByText(text);
+  useEffect(
+    () => {
+      WEB_HELP_OUTSIDE_API.selectByPageId = pageId => {
+        if (tableOfContentsViewModel.tree) {
+          return tableOfContentsViewModel.tree.selectPageFromOutside(pageId, true);
+        }
+        return false;
+      };
+      WEB_HELP_OUTSIDE_API.filterByText = text => {
+        if (tableOfContentsViewModel.tree) {
+          tableOfContentsViewModel.tree.filter(text);
+        }
+      };
+      // first data fetching
+      dataLayerConnection.tableOfContentsFetchingController.runFetching();
+    },
+    dataLayerConnectionDeps,
+  );
 
-    dataLayerConnection.tableOfContentsFetchingController.fetch().catch(() => {
-      // TODO [dmitry.makhnev]: log
-    });
-  }, []);
+  const retryToLoadingData = useCallback(
+    () => {
+      dataLayerConnection.tableOfContentsFetchingController.runFetching();
+    },
+    dataLayerConnectionDeps,
+  );
 
   return (
     <TableOfContentsPanel
       className={props.className}
-      dataState={dataLayerConnection.tableOfContentsModel.fetchingDataState.state}
       viewModel={tableOfContentsViewModel}
+      retryToLoadingData={retryToLoadingData}
     />
   );
 });

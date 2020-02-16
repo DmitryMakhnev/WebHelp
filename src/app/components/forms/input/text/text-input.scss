@@ -1,0 +1,45 @@
+@import "../../../../styles/vars-and-mixins";
+
+.root {
+  position: relative;
+  padding: $grid-module_3x $grid-module_8x;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  }
+
+  .input {
+    @include resetInput();
+    font-family: $default-font-family;
+    font-size: $default-font-size;
+    color: $default-input-text-color;
+    z-index: 1;
+    flex-grow: 1;
+    }
+    .input::placeholder {
+      color: $default-input-placeholder-color;
+      }
+
+  .icons {
+    padding-left: $grid-module_2x;
+    height: $default-font-size + $grid-module_3x * 2;
+    margin: -$grid-module_3x 0;
+    display: flex;
+    align-items: center;
+    }
+
+  .background {
+    @include absoluteFill();
+    box-sizing: border-box;
+    border: 1px solid $default-separator-color;
+    transition: border-color $default-animation-function  $default-little-animation-duration;
+    will-change: border-color;
+    }
+    .root:hover .background,
+    .input:focus ~ .background {
+      border-color: $default-selected-separator-color;
+      }
+
+    .hiddenLabelText {
+      visibility: hidden;
+      }

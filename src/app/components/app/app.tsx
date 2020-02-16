@@ -1,13 +1,13 @@
 import React, { FC } from 'react';
-import styles from './app.scss';
-import { MainContent } from '../main-content/main-content';
-import { Header } from '../header/header';
-import { TableOfContentsPanelHoc } from '../../higher-order-components/table-of-contents-panel/table-of-contents-panel.hoc';
+import { IntlProvider } from 'react-intl';
+import enMessages from '../../../../lang/en.json';
+import { Layout } from '../layout/layout';
 
 export const App: FC = () => (
-  <div className={styles.root}>
-    <Header className={styles.header} />
-    <TableOfContentsPanelHoc className={styles.TableOfContentsPanel} />
-    <MainContent className={styles.mainContent} />
-  </div>
+  <IntlProvider
+    locale="en"
+    messages={enMessages as Record<string, string>}
+  >
+    <Layout />
+  </IntlProvider>
 );
