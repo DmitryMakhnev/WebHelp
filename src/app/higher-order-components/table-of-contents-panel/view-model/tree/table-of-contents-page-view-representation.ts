@@ -1,7 +1,7 @@
 import { action, observable } from 'mobx';
-import { ChunkedRenderListItem } from '../../../../components/chunked-render-list/chunked-render-list-item';
+import { ChunkedListItem } from '../../../../components/chunked-list/types/chunked-list-item';
 
-export class TableOfContentsPageViewRepresentation implements ChunkedRenderListItem {
+export class TableOfContentsPageViewRepresentation implements ChunkedListItem {
   constructor(
     public page: TableOfContentsPage,
     public anchors: TableOfContentsAnchor[]|undefined,

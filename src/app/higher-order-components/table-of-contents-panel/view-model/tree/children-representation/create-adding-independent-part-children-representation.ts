@@ -1,7 +1,7 @@
 import { TableOfContentsChildrenModificationRepresentation } from './table-of-contents-children-modification-representation';
 import { TableOfContentsPageViewRepresentation } from '../table-of-contents-page-view-representation';
 import { TableOfContentsPageViewRepresentationById } from '../utils/create-page-view-representations-by-id-index';
-import { ChunkedRenderListItemsModificationType } from '../../../../../components/chunked-render-list/chunked-render-list-items-modification-type';
+import { ChunkedListItemsModificationType } from '../../../../../components/chunked-list/types/chunked-list-items-modification-type';
 import { getFirstElementFormSet } from '../../../../../../lib/sets/get-first-element-of-set';
 import { insertInArrayAfter } from '../../../../../../lib/arrays/insert-in-array-after';
 
@@ -55,7 +55,7 @@ export function createAddingIndependentPartChildrenRepresentation(
 
   let resultChildren: TableOfContentsPageViewRepresentation[] = childrenOfCurrentRepresentation;
   let resultModifyingChildren: TableOfContentsPageViewRepresentation[] = [];
-  let resultModificationType: ChunkedRenderListItemsModificationType = 'INTERACTION_WITH';
+  let resultModificationType: ChunkedListItemsModificationType = 'INTERACTION_WITH';
 
   // check that new representation in current children
   const indexOfInteractionRepresentationInCurrentChildren = childrenOfCurrentRepresentation

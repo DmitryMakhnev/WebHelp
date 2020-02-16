@@ -2,7 +2,7 @@ import HelpTOCJson from '../../../../../../stub-server/public/api/2019.3/HelpTOC
 import { createTableOfContentsTree } from './table-of-contents-tree';
 import { IncorrectFixtureError } from '../../../../../lib/errors/incorrect-fixture-error';
 import { insertInArrayAfter } from '../../../../../lib/arrays/insert-in-array-after';
-import { getIdsOfItemsAsArray } from '../../../../components/chunked-render-list/chunks/test-utils/get-ids-of-items-as-array';
+import { getIdsOfItemsAsArray } from '../../../../components/chunked-list/chunks/test-utils/get-ids-of-items-as-array';
 import { TableOfContentsPageViewRepresentation } from './table-of-contents-page-view-representation';
 
 const tableOfContentsFixture: TableOfContentsApiResponse = (HelpTOCJson as unknown) as

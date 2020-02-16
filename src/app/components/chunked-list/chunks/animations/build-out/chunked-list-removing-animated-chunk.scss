@@ -1,0 +1,8 @@
+@import "../../../../../styles/vars-and-mixins";
+
+.root {
+  overflow: hidden;
+  // you can extend chunked render list component setting for providing this by settings of list
+  transition: height $default-animation-function $default-micro-animation-duration;
+  will-change: height;
+  }

@@ -1,5 +1,5 @@
 import { TableOfContentsPageViewRepresentation } from '../table-of-contents-page-view-representation';
-import { ChunkedRenderListItemsModification } from '../../../../../components/chunked-render-list/chunked-render-list-items-modification';
+import { ChunkedListItemsModification } from '../../../../../components/chunked-list/types/chunked-list-items-modification';
 
 export interface TableOfContentsChildrenModificationRepresentation
-  extends ChunkedRenderListItemsModification<TableOfContentsPageViewRepresentation> {}
+  extends ChunkedListItemsModification<TableOfContentsPageViewRepresentation> {}

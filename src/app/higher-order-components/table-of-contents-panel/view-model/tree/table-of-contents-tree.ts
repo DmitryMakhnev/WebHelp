@@ -14,14 +14,14 @@ import {
 import { createChildrenAppendedChildrenRepresentation } from './children-representation/create-children-appended-children-representation';
 import { createChildrenRemovedChildrenRepresentation } from './children-representation/create-children-removed-children-representation';
 import { restoreTableOfContentsViewRepresentationChildren } from './utils/restore-table-of-contents-view-representation-children';
-import { ChunkedRenderListModificationHolder } from '../../../../components/chunked-render-list/chunked-render-list-modification-holder';
+import { ChunkedListModificationHolder } from '../../../../components/chunked-list/types/chunked-list-modification-holder';
 import { createAddingIndependentPartChildrenRepresentation } from './children-representation/create-adding-independent-part-children-representation';
 import { getPathToPageRepresentationFromRoot } from './utils/get-path-to-page-representation-from-root';
 import { Debouncer } from '../../../../../lib/debounce/debouncer';
 
 export class TableOfContentsTree
 implements
-  ChunkedRenderListModificationHolder<
+  ChunkedListModificationHolder<
     TableOfContentsPageViewRepresentation,
     TableOfContentsChildrenModificationRepresentation
   > {

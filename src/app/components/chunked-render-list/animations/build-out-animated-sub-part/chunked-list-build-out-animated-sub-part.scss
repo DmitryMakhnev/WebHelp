@@ -1,7 +1,0 @@
-@import "../../../../styles/vars-and-mixins";
-
-.root {
-  overflow: hidden;
-  transition: height $default-animation-function $default-micro-animation-duration;
-  will-change: height;
-  }
