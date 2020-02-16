@@ -1,6 +1,5 @@
 import {
   createPageViewRepresentationsByIdIndex,
-  TableOfContentsPageViewRepresentationById
 } from './create-page-view-representations-by-id-index';
 import { TableOfContentsPageViewRepresentation } from '../table-of-contents-page-view-representation';
 import { getPathToPageRepresentationFromRoot } from './get-path-to-page-representation-from-root';
